@@ -1,9 +1,10 @@
 #include <SFML/Graphics.hpp>
-#include "Engine.h"
+#include "MainMenu.h"
 
-int main()
-{
-    Engine engine;
-    engine.run();
+
+int main() {
+    MainMenu menu;
+    menu.Menu();
+
     return 0;
 }
