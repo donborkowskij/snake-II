@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_EXE_LINKER_FLAGS "-static -static-libgcc")
 set(SFML_STATIC_LIBRARIES TRUE)
 
-add_executable(FirstProg src/main.cpp src/Engine.cpp headers/Engine.h src/draw.cpp src/input.cpp src/Snake.cpp headers/Snake.h src/update.cpp src/Apple.cpp headers/Apple.h src/Wall.cpp headers/Wall.h)
+add_executable(FirstProg src/main.cpp src/Engine.cpp headers/Engine.h src/draw.cpp src/input.cpp src/Snake.cpp headers/Snake.h src/update.cpp src/Apple.cpp headers/Apple.h src/Wall.cpp headers/Wall.h src/MainMenu.cpp headers/MainMenu.h src/Shop.cpp headers/Shop.h src/Achievements.cpp headers/Achievements.h)
 
 include_directories(headers)
 

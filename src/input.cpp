@@ -27,6 +27,10 @@ void Engine::input(){
                 if (event.key.code == Keyboard::Space) {
                     startTheGame();
                 }
+                if (event.key.code == Keyboard::Q){
+                    saveData();
+                    runMenu();
+                }
             }
 
             //Direction

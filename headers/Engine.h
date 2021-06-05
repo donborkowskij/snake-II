@@ -13,6 +13,8 @@
 #include <vector>
 #include <deque>
 #include <fstream>
+#include "MainMenu.h"
+#include "Achievements.h"
 
 using namespace sf;
 using namespace std;
@@ -49,6 +51,8 @@ private:
     Text scoreText;
     Text gameOverText;
     Text pressSpaceText;
+    Text quitToMenuText;
+
 
     Time timeSinceLastMove;
 
@@ -78,7 +82,10 @@ public:
 
     void togglePause();
 
+    void saveData();
+
     void run();
+    void runMenu();
 
 };
 

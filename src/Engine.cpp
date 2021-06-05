@@ -3,6 +3,7 @@
 //
 
 #include "Engine.h"
+#include "iostream"
 
 const sf::Time Engine::TimePerFrame = seconds(1.f/60.f);
 
@@ -36,6 +37,12 @@ Engine::Engine(){
     gameOverText.setPosition(Vector2f(resolution.x / 2 - gameOverTextBounds.width / 2, 100));
     gameOverText.setOutlineColor(Color::Black);
     gameOverText.setOutlineThickness(2);
+
+    setupText(&quitToMenuText, mainFont, "Press Q to quit to Main menu", 30, Color::Yellow);
+    FloatRect  quitToMenuBounds= quitToMenuText.getLocalBounds();
+    quitToMenuText.setPosition(Vector2f(resolution.x / 2 - quitToMenuBounds.width / 2, 500));
+    quitToMenuText.setOutlineColor(Color::Black);
+    quitToMenuText.setOutlineThickness(1);
 
     setupText(&pressSpaceText, mainFont, "Press SPACE to try again", 38, Color::Green);
     FloatRect pressSpaceTextBounds = pressSpaceText.getLocalBounds();
@@ -192,6 +199,38 @@ void Engine::loadLevel(int levelNumber) {
     level.close();
 }
 
+void Engine::saveData() {
+    //load previous data
+
+    ifstream saveFileProfile ("assets/save/dataProfile.txt");
+    int a;//apples
+    int highScore;
+    int TotalApples;
+    if (saveFileProfile.is_open()){
+        saveFileProfile>>a>>highScore>>TotalApples;
+        cout<<a<<" "<<highScore<<" "<<TotalApples<<endl;
+        saveFileProfile.close();
+    }
+
+    //store new + old data
+    ofstream saveProfile ("assets/save/dataProfile.txt");
+    if (saveProfile.is_open()){
+        saveProfile<<a + applesEatenTotal<<endl;
+        if (highScore < score)
+            saveProfile<<score<<endl;
+        else saveProfile<<highScore<<endl;
+
+        if (TotalApples < applesEatenTotal){
+            saveProfile<<applesEatenTotal;
+        }
+        else saveProfile<<TotalApples;
+        cout<<a + applesEatenTotal<<" "<<score<<endl;
+        saveFileProfile.close();
+    }
+
+
+}
+
 void Engine::run(){
     Clock clock;
 
@@ -216,5 +255,13 @@ void Engine::run(){
         input();
         update();
         draw();
+
     }
+
 }
+void Engine::runMenu(){
+    window.close();
+    MainMenu menu;
+    menu.Menu();
+}
+

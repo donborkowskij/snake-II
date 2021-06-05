@@ -30,6 +30,7 @@ void Engine::draw(){
     if(currentGameState == GameState::GAMEOVER) {
         window.draw(gameOverText);
         window.draw(pressSpaceText);
+        window.draw(quitToMenuText);
     }
 
     window.display();

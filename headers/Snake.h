@@ -15,6 +15,7 @@ private:
     RectangleShape section;
 
 public:
+    static void SnakeColor(int a);
     explicit Snake(Vector2f startPosition);
 
     Vector2f getPosition();
