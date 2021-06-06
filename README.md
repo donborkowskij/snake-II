@@ -14,5 +14,5 @@ The compiler used for the code was MinGW64
 
 
 Authors:  
-Donatas Borkovskij
+Donatas Borkovskij  
 Aleksandr Marek Višnevskij 
