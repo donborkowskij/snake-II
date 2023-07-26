@@ -1,4 +1,4 @@
-# Snake_FirstProgrammingPractise
+# Snake-FirstProgrammingPractise
 
 Simple snake game
 
