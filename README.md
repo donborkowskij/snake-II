@@ -1,8 +1,8 @@
-# snake-first-programming-practise
+# Snake-first-programming-practise
 
-Simple snake game
+Simple Snake game
 
-Arrow keys to control the snake. To get to the next lvl you need to eat 10 apples. You can buy colors of the snake using apples and earn achievements.
+Arrow keys to control the Snake. To get to the next lvl you need to eat 10 apples. You can buy colors of the Snake using apples and earn Achievements.
 
 Done on windows 10 using SFML in Clion
 

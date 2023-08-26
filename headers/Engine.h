@@ -1,9 +1,4 @@
-//
-// Created by donat on 5/30/2021.
-//
-
-#ifndef FIRSTPROG_ENGINE_H
-#define FIRSTPROG_ENGINE_H
+#pragma once
 
 #include "Snake.h"
 #include "Apple.h"
@@ -20,8 +15,34 @@ using namespace sf;
 using namespace std;
 
 class Engine {
-private:
+public:
+    enum Direction {
+        UP, RIGHT, DOWN, LEFT
+    };
+    enum GameState {
+        RUNNING, PAUSED, GAMEOVER
+    };
 
+    Engine();
+
+    static void setupText(Text *textItem, const Font &font, const String &value, int size, Color colour);
+    void input();
+    void addDirection(int newDirection);
+    void update();
+    void draw();
+    void newSnake();
+    void addSnake();
+    void moveApple();
+    void checkLevelFiles();
+    void loadLevel(int levelNumber);
+    void beginNextLevel();
+    void startTheGame();
+    void togglePause();
+    void saveData();
+    void run();
+    void runMenu();
+
+private:
     Vector2f resolution;
     RenderWindow window;
     const unsigned int FPS = 60;
@@ -30,7 +51,7 @@ private:
     vector<Snake> snake;
 
     int snakeDirection;
-    deque<int> directionQueue; //queue for direction key presses
+    deque<int> directionQueue;
     int speed;
     int sectionsToAdd;
     int applesEatenThisLevel;
@@ -53,41 +74,8 @@ private:
     Text pressSpaceText;
     Text quitToMenuText;
 
-
     Time timeSinceLastMove;
 
     int currentGameState;
-    int lastGameState; // for storing the last state the game was in
-
-public:
-    enum Direction{ UP, RIGHT, DOWN, LEFT};
-    enum GameState {RUNNING, PAUSED, GAMEOVER};
-    Engine();
-    void input();
-    void addDirection(int newDirection);
-    void update();
-    void draw();
-
-    static void setupText(Text *textItem, const Font &font, const String &value, int size, Color colour);
-
-    void newSnake();
-    void addSnake();
-
-    void moveApple();
-    void checkLevelFiles();
-    void loadLevel(int levelNumber);
-
-    void beginNextLevel();
-    void startTheGame();
-
-    void togglePause();
-
-    void saveData();
-
-    void run();
-    void runMenu();
-
+    int lastGameState;
 };
-
-
-#endif //FIRSTPROG_ENGINE_H

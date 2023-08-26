@@ -1,21 +1,18 @@
-//
-// Created by donat on 5/30/2021.
-//
 #include "Engine.h"
 
-void Engine::draw(){
+void Engine::draw() {
     window.clear(Color::Black);
 
-    //draw wall
-    for (auto & w : wallSections) {
+    //draw Wall
+    for (auto &w: wallSections) {
         window.draw(w.getShape());
     }
 
-    //Draw apple
+    //Draw Apple
     window.draw(apple.getSprite());
 
     //Draw Snake
-    for(auto & s : snake){
+    for (auto &s: snake) {
         window.draw(s.getShape());
     }
 
@@ -27,7 +24,7 @@ void Engine::draw(){
     window.draw(scoreText);
 
     //Draw game over
-    if(currentGameState == GameState::GAMEOVER) {
+    if (currentGameState == GameState::GAMEOVER) {
         window.draw(gameOverText);
         window.draw(pressSpaceText);
         window.draw(quitToMenuText);

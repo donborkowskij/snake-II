@@ -1,7 +1,3 @@
-//
-// Created by marki on 2021-06-04.
-//
-
 #ifndef FIRSTPROG_SHOP_H
 #define FIRSTPROG_SHOP_H
 
@@ -10,35 +6,30 @@
 #include "Snake.h"
 #include <fstream>
 
+#define SHOP_ELEMENTS 4
 
 class Shop {
+public:
+    Shop();
+    void shopRun();
+    void runMenu();
+    void loadData();
+    void saveBought(int GreenSnake, int RedSnake, int BlueSnake, int YellowSnake);
+    int returnBought(int number);
+    void saveData();
+    void snakeColorBuy(int a);
+
 private:
     int ShopSelect;
     sf::Font font;
-    sf::Text MainText[4];
-    sf::Text TextChild[4];
-    sf::Text ExtraText[5];
-    sf::Text AltText[4];
-
-public:
-    void LoadData();
-    void Menu();
-
-    void Draw(sf::RenderWindow &window);
-    void DrawExtra(sf::RenderWindow &window);
-
+    sf::Text mainText[SHOP_ELEMENTS];
+    sf::Text textChild[SHOP_ELEMENTS];
+    sf::Text altText[SHOP_ELEMENTS];
+    sf::Text extraText[2];
     void moveUp();
     void moveDown();
-
-    int ReturnBought(int number);
-    void SaveBought(int GreenSnake, int  RedSnake, int BlueSnake, int YellowSnake);
-    void SaveData();
-
-    void ShopRun();
-    void runMenu();
-
-    void SnakeColorBuy(int a);
-    //void runMenu();
+    void draw(sf::RenderWindow &window);
+    void drawExtra(sf::RenderWindow &window);
 };
 
 

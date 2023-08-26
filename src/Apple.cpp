@@ -1,12 +1,8 @@
-//
-// Created by donat on 5/30/2021.
-//
-
 #include "Apple.h"
 
-Apple::Apple(){
+Apple::Apple() {
     Vector2f startingPosition(400, 300);
-    sprite.setSize(Vector2f(20,20));
+    sprite.setSize(Vector2f(20, 20));
     sprite.setFillColor(Color::Red);
     sprite.setPosition(startingPosition);
 }

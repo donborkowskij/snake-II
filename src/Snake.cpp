@@ -1,11 +1,9 @@
-//
-// Created by donat on 5/30/2021.
-//
-
 #include "Snake.h"
+
 int a;
+
 Snake::Snake(Vector2f startPosition) {
-    section.setSize(Vector2f(20,20));
+    section.setSize(Vector2f(20, 20));
     switch (a) {
         case 0:
             section.setFillColor(Color::Green);
@@ -27,10 +25,11 @@ Snake::Snake(Vector2f startPosition) {
     section.setPosition(startPosition);
     position = startPosition;
 }
-void Snake::SnakeColor(int b) {
-    ::a = b;
 
+void Snake::snakeColor(int b) {
+    ::a = b;
 }
+
 Vector2f Snake::getPosition() {
     return position;
 }
@@ -43,6 +42,6 @@ RectangleShape Snake::getShape() {
     return section;
 }
 
-void Snake::update(){
+void Snake::update() {
     section.setPosition(position);
 }

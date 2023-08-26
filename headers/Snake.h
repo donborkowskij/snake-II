@@ -1,7 +1,3 @@
-//
-// Created by donat on 5/30/2021.
-//
-
 #ifndef FIRSTPROG_SNAKE_H
 #define FIRSTPROG_SNAKE_H
 
@@ -10,21 +6,17 @@
 using namespace sf;
 
 class Snake {
+public:
+    explicit Snake(Vector2f startPosition);
+    static void snakeColor(int a);
+    RectangleShape getShape();
+    Vector2f getPosition();
+    void setPosition(Vector2f newPosition);
+    void update();
+
 private:
     Vector2f position;
     RectangleShape section;
-
-public:
-    static void SnakeColor(int a);
-    explicit Snake(Vector2f startPosition);
-
-    Vector2f getPosition();
-    void setPosition(Vector2f newPosition);
-
-    RectangleShape getShape();
-
-    void update();
-
 };
 
 

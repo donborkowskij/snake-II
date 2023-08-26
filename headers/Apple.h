@@ -1,7 +1,3 @@
-//
-// Created by donat on 5/30/2021.
-//
-
 #ifndef FIRSTPROG_APPLE_H
 #define FIRSTPROG_APPLE_H
 
@@ -10,16 +6,13 @@
 using namespace sf;
 
 class Apple {
-private:
-    RectangleShape sprite;
-
 public:
     Apple();
-
     void setPosition(Vector2f newPosition);
     RectangleShape getSprite();
 
+private:
+    RectangleShape sprite;
 };
-
 
 #endif //FIRSTPROG_APPLE_H

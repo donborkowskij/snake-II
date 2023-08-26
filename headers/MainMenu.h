@@ -1,40 +1,25 @@
-//
-// Created by marki on 2021-06-02.
-//
-
-#ifndef FIRSTPROG_MAINMENU_H
-#define FIRSTPROG_MAINMENU_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 #include "Engine.h"
 
 //Edit if you want to add more elements
-#define max_main_menu 4
+#define MENU_ELEMENTS 4
 
 
 class MainMenu {
-    private:
-        int mainMenuSelect;
-        sf::Font font;
-        sf::Text mainMenu[max_main_menu];
-    public:
-        void Menu();
+public:
+    explicit MainMenu(sf::RenderWindow& window);
+    void menuRun(RenderWindow& window);
 
-        void Draw(sf::RenderWindow &window);
-        void moveUp();
-        void moveDown();
-
-        //ToDo: Add move Main Menu navigation options (?)
-        //void moveLeft();
-        //void moveRight();
-        void MenuRun();
-        void RunSnake();
-        void RunShop();
-        void RunAchievements();
-
-
-    //void runMenu();
+private:
+    int mainMenuSelect;
+    sf::Font font;
+    sf::Text mainMenu[MENU_ELEMENTS];
+    void moveUp();
+    void moveDown();
+    void draw(sf::RenderWindow &window);
+    void runSnake();
+    void runShop();
+    void runAchievements();
 };
-
-
-#endif //FIRSTPROG_MAINMENU_H
