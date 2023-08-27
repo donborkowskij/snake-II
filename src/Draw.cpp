@@ -18,7 +18,6 @@ void Engine::draw() {
 
     //Draw text
     window.draw(titleText);
-
     window.draw(currentLevelText);
     window.draw(applesEatenText);
     window.draw(scoreText);

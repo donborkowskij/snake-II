@@ -59,9 +59,9 @@ Shop::Shop() {
     mainText[ShopSelect].setFillColor(sf::Color::White);
 }
 
-void Shop::shopRun() {
+void Shop::shopRun(sf::RenderWindow &window) {
     loadData();
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Snake");
+//    sf::RenderWindow window(sf::VideoMode(800, 600), "Snake");
     sf::Texture background;
     background.loadFromFile("assets/texture/ShopMenu.png");
     sf::Sprite bg_image(background);

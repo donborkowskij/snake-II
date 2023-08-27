@@ -1,10 +1,9 @@
 #include <SFML/Graphics.hpp>
-#include "MainMenu.h"
+#include "Game.h"
 
 int main() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Snake2");
-
-    MainMenu menu(window);
+    Game game;
+    game.run();
 
     return 0;
 }
