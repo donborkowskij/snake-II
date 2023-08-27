@@ -9,8 +9,8 @@
 
 class MainMenu {
 public:
-    explicit MainMenu(sf::RenderWindow& window);
-    void menuRun(RenderWindow& window);
+    explicit MainMenu();
+    void menuRun(RenderWindow &window);
 
 private:
     int mainMenuSelect;
@@ -19,7 +19,7 @@ private:
     void moveUp();
     void moveDown();
     void draw(sf::RenderWindow &window);
-    void runSnake();
-    void runShop();
-    void runAchievements();
+    static void runSnake();
+    static void runShop(sf::RenderWindow& window);
+    static void runAchievements();
 };

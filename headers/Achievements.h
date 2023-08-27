@@ -1,5 +1,4 @@
-#ifndef FIRSTPROG_ACHIEVEMENTS_H
-#define FIRSTPROG_ACHIEVEMENTS_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 #include "MainMenu.h"
@@ -22,6 +21,3 @@ private:
     sf::Text TextChild[16];
     sf::Text ExtraText[3];
 };
-
-
-#endif //FIRSTPROG_ACHIEVEMENTS_H

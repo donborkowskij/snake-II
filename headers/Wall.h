@@ -1,5 +1,4 @@
-#ifndef FIRSTPROG_WALL_H
-#define FIRSTPROG_WALL_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 
@@ -13,5 +12,3 @@ public:
 private:
     RectangleShape wallShape;
 };
-
-#endif //FIRSTPROG_WALL_H

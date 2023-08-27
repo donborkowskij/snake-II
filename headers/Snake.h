@@ -1,5 +1,4 @@
-#ifndef FIRSTPROG_SNAKE_H
-#define FIRSTPROG_SNAKE_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 
@@ -18,6 +17,3 @@ private:
     Vector2f position;
     RectangleShape section;
 };
-
-
-#endif //FIRSTPROG_SNAKE_H

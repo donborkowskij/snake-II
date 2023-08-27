@@ -1,5 +1,4 @@
-#ifndef FIRSTPROG_APPLE_H
-#define FIRSTPROG_APPLE_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 
@@ -14,5 +13,3 @@ public:
 private:
     RectangleShape sprite;
 };
-
-#endif //FIRSTPROG_APPLE_H

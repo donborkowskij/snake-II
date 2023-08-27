@@ -1,5 +1,4 @@
-#ifndef FIRSTPROG_SHOP_H
-#define FIRSTPROG_SHOP_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 #include "MainMenu.h"
@@ -11,13 +10,8 @@
 class Shop {
 public:
     Shop();
-    void shopRun();
+    void shopRun(sf::RenderWindow &window);
     void runMenu();
-    void loadData();
-    void saveBought(int GreenSnake, int RedSnake, int BlueSnake, int YellowSnake);
-    int returnBought(int number);
-    void saveData();
-    void snakeColorBuy(int a);
 
 private:
     int ShopSelect;
@@ -30,7 +24,9 @@ private:
     void moveDown();
     void draw(sf::RenderWindow &window);
     void drawExtra(sf::RenderWindow &window);
+    void loadData();
+    void saveBought(int GreenSnake, int RedSnake, int BlueSnake, int YellowSnake);
+    int returnBought(int number);
+    void saveData();
+    void snakeColorBuy(int a);
 };
-
-
-#endif //FIRSTPROG_SHOP_H
