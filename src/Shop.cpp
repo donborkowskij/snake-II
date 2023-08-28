@@ -65,6 +65,7 @@ void Shop::update(const sf::Time &deltaTime) {
 
 void Shop::draw() {
     mParam->window->clear();
+    sf::Color(255, 204, 153);
     mParam->window->draw(mBgImage);
     drawExtra(mParam->window);
     print(mParam->window);

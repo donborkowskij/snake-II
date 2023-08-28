@@ -4,6 +4,7 @@
 const sf::Time Engine::TimePerFrame = sf::seconds(1.f / 60.f);
 
 Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
+
     try {
         if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
             throw "mFont not loaded!!!";
@@ -53,45 +54,33 @@ Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
     pressSpaceText.setOutlineColor(sf::Color::Black);
     pressSpaceText.setOutlineThickness(2);
 
-    dt = clock.restart();
+//    dt = clock.restart();
     startTheGame();
 }
 
 void Engine::update(const sf::Time &deltaTime) {
-    timeSinceLastMove += dt;
+    timeSinceLastMove += deltaTime;
 
     //Update snake position
     if (timeSinceLastMove.asSeconds() >= sf::seconds(1.f / float(speed)).asSeconds()) {
         sf::Vector2f thisSectionPosition = snake[0].getPosition();
         sf::Vector2f lastSectionPosition = thisSectionPosition;
 
-        //
         if (!directionQueue.empty()) {
+            auto newDirection = static_cast<Direction>(directionQueue.front());
             //Make sure the snake doesn't go into apposite direction
             switch (snakeDirection) {
                 case Direction::UP:
-                    if (directionQueue.front() != Direction::DOWN) {
-                        snakeDirection = directionQueue.front();
-
-                    }
+                    snakeDirection = (newDirection != Direction::DOWN) ? newDirection : snakeDirection;
                     break;
                 case Direction::DOWN:
-                    if (directionQueue.front() != Direction::UP) {
-                        snakeDirection = directionQueue.front();
-
-                    }
+                    snakeDirection = (newDirection != Direction::UP) ? newDirection : snakeDirection;
                     break;
                 case Direction::LEFT:
-                    if (directionQueue.front() != Direction::RIGHT) {
-                        snakeDirection = directionQueue.front();
-
-                    }
+                    snakeDirection = (newDirection != Direction::RIGHT) ? newDirection : snakeDirection;
                     break;
                 case Direction::RIGHT:
-                    if (directionQueue.front() != Direction::LEFT) {
-                        snakeDirection = directionQueue.front();
-
-                    }
+                    snakeDirection = (newDirection != Direction::LEFT) ? newDirection : snakeDirection;
                     break;
             }
             directionQueue.pop_front();
@@ -256,7 +245,7 @@ void Engine::input() {
 void Engine::startTheGame() {
 
     score = 0;
-    speed = 20;
+    speed = 10;
     snakeDirection = Direction::RIGHT;
     timeSinceLastMove = sf::Time::Zero;
 
@@ -305,7 +294,6 @@ void Engine::newSnake() {
     snake.emplace_back(sf::Vector2f(100, 100));
     snake.emplace_back(sf::Vector2f(80, 100));
     snake.emplace_back(sf::Vector2f(60, 100));
-
 }
 
 //The tail of the Snake, to elongate the body
@@ -365,7 +353,6 @@ void Engine::setupText(sf::Text *textItem, const sf::Font &font, const sf::Strin
     textItem->setString(value);
     textItem->setCharacterSize(size);
     textItem->setFillColor(colour);
-
 }
 
 void Engine::checkLevelFiles() {
@@ -429,8 +416,6 @@ void Engine::saveData() {
         std::cout << a + applesEatenTotal << " " << score << std::endl;
         saveFileProfile.close();
     }
-
-
 }
 
 void Engine::addDirection(int newDirection) {

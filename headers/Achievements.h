@@ -4,6 +4,15 @@
 #include "MainMenu.h"
 #include "State.h"
 
+#define ACHIEVEMENT_ELEMENTS 16
+
+struct TextInfo {
+    std::string string;
+    int characterSize;
+    sf::Vector2f position;
+    sf::Color fillColor;
+};
+
 class Achievements : public State {
 public:
     Achievements(std::shared_ptr<Param> param);
@@ -24,10 +33,11 @@ private:
     std::shared_ptr<Param> mParam;
     sf::Font mFont;
     int mShopSelect;
-    //Change this if you add more elements.
-    sf::Text mAchiveText[16];
-    sf::Text mTextChild[16];
+    sf::Text mAchiveText[ACHIEVEMENT_ELEMENTS];
+    sf::Text mTextChild[ACHIEVEMENT_ELEMENTS];
     sf::Text mExtraText[3];
+    const sf::Color mGrayColor = sf::Color(96, 96, 96);
+    const sf::Color mOrangeColor = sf::Color(255, 204, 153);
 
     sf::Texture mBackground;
     sf::Sprite mBgImage;
