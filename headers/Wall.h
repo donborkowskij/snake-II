@@ -2,13 +2,13 @@
 
 #include <SFML/Graphics.hpp>
 
-using namespace sf;
 
 class Wall {
 public:
-    Wall(Vector2f position, Vector2f size);
-    RectangleShape getShape();
+    Wall(sf::Vector2f position, sf::Vector2f size);
+
+    sf::RectangleShape getShape();
 
 private:
-    RectangleShape wallShape;
+    sf::RectangleShape wallShape;
 };

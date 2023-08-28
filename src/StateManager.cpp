@@ -16,13 +16,13 @@ void StateManager::add(std::unique_ptr<State> toAdd, bool replace) {
 }
 
 void StateManager::stateChange() {
-    if (mAdd){
-        if (mReplace && (!mStateStack.empty())){
+    if (mAdd) {
+        if (mReplace && (!mStateStack.empty())) {
             mStateStack.pop();
             mReplace = false;
         }
 
-        if (!mStateStack.empty()){
+        if (!mStateStack.empty()) {
             mStateStack.top()->pause();
         }
 
@@ -31,10 +31,10 @@ void StateManager::stateChange() {
         mAdd = false;
     }
 
-    if (mDelete && (!mStateStack.empty())){
+    if (mDelete && (!mStateStack.empty())) {
         mStateStack.pop();
 
-        if (!mStateStack.empty()){
+        if (!mStateStack.empty()) {
             mStateStack.top()->start();
         }
     }

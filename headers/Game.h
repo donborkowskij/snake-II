@@ -5,7 +5,7 @@
 #include "StateManager.h"
 
 struct Param {
-    std::unique_ptr<StateManager>  states;
+    std::unique_ptr<StateManager> states;
     std::unique_ptr<sf::RenderWindow> window;
 
     Param() {
@@ -17,9 +17,8 @@ struct Param {
 class Game {
 public:
     Game();
-    ~Game();
 
-    void run();
+    ~Game();
 
 private:
     const sf::Time SECONDS_PER_FRAME = sf::seconds(1.f / 60.f);

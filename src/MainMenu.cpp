@@ -7,43 +7,41 @@
 #include "iostream"
 
 
-MainMenu::MainMenu(std::shared_ptr<Param> param) : mParam(param){
+MainMenu::MainMenu(std::shared_ptr<Param> param) : mParam(param) {
     try {
-        if (!font.loadFromFile("assets/fonts/slant_regular.ttf")) {
-            throw "font not loaded!!!";
+        if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
+            throw "mFont not loaded!!!";
         }
     }
     catch (const char *txtE) {
-        std::cout << "Exception: " << txtE << endl;
+        std::cout << "Exception: " << txtE << std::endl;
     }
 
-    const Color &fillColor = sf::Color(255, 204, 153);
-    int fontSize = 50;
-    String menuOptions[4]{"Play", "Store", "Achievements", "Quit"};
+    sf::String menuOptions[MENU_ELEMENTS]{"Play", "Store", "Achievements", "Quit"};
     float position = 100;
 
     //menu buttons
     for (int i = 0; i < MENU_ELEMENTS; ++i) {
-        mainMenu[i] = sf::Text(menuOptions[i], font, fontSize);
-        mainMenu[i].setFillColor(fillColor);
-        mainMenu[i].setPosition(position, position * (float) (i + 1));
+        mMainMenu[i] = sf::Text(menuOptions[i], mFont, mFontSize);
+        mMainMenu[i].setFillColor(mFillColor);
+        mMainMenu[i].setPosition(position, position * (float) (i + 1));
     }
 
-    mainMenuSelect = 0;
-    mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
+    mMainMenuSelect = 0;
+    mMainMenu[mMainMenuSelect].setFillColor(sf::Color::White);
 
-    background.loadFromFile("assets/texture/TitleScreen.png");
-    bgImage.setTexture(background);
+    mBackground.loadFromFile("assets/texture/TitleScreen.png");
+    mBgImage.setTexture(mBackground);
 }
 
-void MainMenu::update(const sf::Time& deltaTime) {
-    isPlaySelected = true;
+void MainMenu::update(const sf::Time &deltaTime) {
+    mMainMenu[mMainMenuSelect].setCharacterSize(80);
+    mMainMenu[mMainMenuSelect].setFillColor(sf::Color::White);
 }
 
 void MainMenu::draw() {
-
     mParam->window->clear();
-    mParam->window->draw(bgImage);
+    mParam->window->draw(mBgImage);
     print(mParam->window);
     mParam->window->display();
 }
@@ -62,17 +60,17 @@ void MainMenu::input() {
                 moveUp();
             }
             if (event.key.code == sf::Keyboard::Return) {
-                switch (mainMenuSelect) {
+                switch (mMainMenuSelect) {
                     case 0:
-                        mParam->window->close();
+                        mParam->states->add(std::make_unique<Engine>(mParam));
 //                        runSnake();
                         break;
                     case 1:
-                        mParam->window->close();
-//                        runShop(window);
+//                        mParam->window->close();
+                        mParam->states->add(std::make_unique<Shop>(mParam));
                         break;
                     case 2:
-                        mParam->window->close();
+                        mParam->states->add(std::make_unique<Achievements>(mParam));
 //                        runAchievements();
                         break;
                     case 3:
@@ -85,90 +83,31 @@ void MainMenu::input() {
 }
 
 void MainMenu::moveUp() {
-    if (mainMenuSelect == 0) {
-        mainMenu[mainMenuSelect].setFillColor(sf::Color(255, 204, 153));
-        mainMenuSelect = MENU_ELEMENTS - 1;
-        mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
+    if (mMainMenuSelect == 0) {
+        mMainMenu[mMainMenuSelect].setFillColor(mFillColor);
+        mMainMenu[mMainMenuSelect].setCharacterSize(mFontSize);
+        mMainMenuSelect = MENU_ELEMENTS - 1;
     } else {
-        mainMenu[mainMenuSelect].setFillColor(sf::Color(255, 204, 153));
-        mainMenuSelect--;
-        mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
+        mMainMenu[mMainMenuSelect].setFillColor(mFillColor);
+        mMainMenu[mMainMenuSelect].setCharacterSize(mFontSize);
+        mMainMenuSelect--;
     }
 }
 
 void MainMenu::moveDown() {
-    if (mainMenuSelect == MENU_ELEMENTS - 1) {
-        mainMenu[mainMenuSelect].setFillColor(sf::Color(255, 204, 153));
-        mainMenuSelect = 0;
-        mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
+    if (mMainMenuSelect == MENU_ELEMENTS - 1) {
+        mMainMenu[mMainMenuSelect].setFillColor(mFillColor);
+        mMainMenu[mMainMenuSelect].setCharacterSize(mFontSize);
+        mMainMenuSelect = 0;
     } else {
-        mainMenu[mainMenuSelect].setFillColor(sf::Color(255, 204, 153));
-        mainMenuSelect++;
-        mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
+        mMainMenu[mMainMenuSelect].setFillColor(mFillColor);
+        mMainMenu[mMainMenuSelect].setCharacterSize(mFontSize);
+        mMainMenuSelect++;
     }
 }
 
 void MainMenu::print(std::unique_ptr<sf::RenderWindow> &window) {
-    for (const auto &i: mainMenu) {
+    for (const auto &i: mMainMenu) {
         window->draw(i);
     }
 }
-
-//void MainMenu::menuRun(RenderWindow &window) {
-////    sf::RenderWindow window(sf::VideoMode(800, 600), "Snake2");
-//
-//    while (window.isOpen()) {
-//        sf::Event event{};
-//        while (window.pollEvent(event)) {
-//            if (event.type == sf::Event::Closed) {
-//                window.close();
-//            }
-//            if (event.type == sf::Event::KeyReleased) {
-//                if (event.key.code == sf::Keyboard::Down) {
-//                    moveDown();
-//                }
-//                if (event.key.code == sf::Keyboard::Up) {
-//                    moveUp();
-//                }
-//                if (event.key.code == sf::Keyboard::Return) {
-//                    switch (mainMenuSelect) {
-//                        case 0:
-//                            window.close();
-//                            runSnake();
-//                            break;
-//                        case 1:
-//                            window.close();
-//                            runShop(window);
-//                            break;
-//                        case 2:
-//                            window.close();
-//                            runAchievements();
-//                            break;
-//                        case 3:
-//                            window.close();
-//                            break;
-//                    }
-//                }
-//            }
-//        }
-//        window.clear();
-//        window.draw(bgImage);
-//        draw(window);
-//        window.display();
-//    }
-//}
-
-//void MainMenu::runSnake() {
-//    Engine engine;
-//    engine.run();
-//}
-//
-//void MainMenu::runShop(sf::RenderWindow &window) {
-//    Shop shop;
-//    shop.shopRun(window);
-//}
-//
-//void MainMenu::runAchievements() {
-//    Achievements achievements;
-//    achievements.achievementsRun();
-//}

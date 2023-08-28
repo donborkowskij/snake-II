@@ -10,11 +10,10 @@
 #include <fstream>
 #include "MainMenu.h"
 #include "Achievements.h"
+#include "State.h"
 
-using namespace sf;
-using namespace std;
 
-class Engine {
+class Engine : public State {
 public:
     enum Direction {
         UP, RIGHT, DOWN, LEFT
@@ -23,35 +22,56 @@ public:
         RUNNING, PAUSED, GAMEOVER
     };
 
-    Engine();
+    Engine(std::shared_ptr<Param> param);
 
-    static void setupText(Text *textItem, const Font &font, const String &value, int size, Color colour);
-    void input();
+    void update(const sf::Time &deltaTime) override;
+
+    void draw() override;
+
+    void input() override;
+
+    static void
+    setupText(sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour);
+
+//    void input();
+
     void addDirection(int newDirection);
-    void update();
-    void draw();
+
+//    void update();
+
+//    void draw();
+
     void newSnake();
+
     void addSnake();
+
     void moveApple();
+
     void checkLevelFiles();
+
     void loadLevel(int levelNumber);
+
     void beginNextLevel();
+
     void startTheGame();
+
     void togglePause();
+
     void saveData();
-    void run();
-    void runMenu();
+
+//    void run();
 
 private:
-    Vector2f resolution;
-    RenderWindow window;
+    std::shared_ptr<Param> mParam;
+    sf::Vector2f resolution;
+//    RenderWindow window;
     const unsigned int FPS = 60;
-    static const Time TimePerFrame;
+    static const sf::Time TimePerFrame;
 
-    vector<Snake> snake;
+    std::vector<Snake> snake;
 
     int snakeDirection;
-    deque<int> directionQueue;
+    std::deque<int> directionQueue;
     int speed;
     int sectionsToAdd;
     int applesEatenThisLevel;
@@ -60,22 +80,25 @@ private:
 
     Apple apple;
 
-    vector<Wall> wallSections;
+    std::vector<Wall> wallSections;
     int currentLevel;
     int maxLevels;
-    vector<String> levels;
+    std::vector<sf::String> levels;
 
-    Font mainFont;
-    Text titleText;
-    Text applesEatenText;
-    Text currentLevelText;
-    Text scoreText;
-    Text gameOverText;
-    Text pressSpaceText;
-    Text quitToMenuText;
+    sf::Font mFont;
+    sf::Text titleText;
+    sf::Text applesEatenText;
+    sf::Text currentLevelText;
+    sf::Text scoreText;
+    sf::Text gameOverText;
+    sf::Text pressSpaceText;
+    sf::Text quitToMenuText;
 
-    Time timeSinceLastMove;
+    sf::Time timeSinceLastMove;
 
     int currentGameState;
     int lastGameState;
+
+    sf::Clock clock;
+    sf::Time dt;
 };

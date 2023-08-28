@@ -17,5 +17,5 @@ add_executable(snake ${SOURCES}
         src/Game.cpp)
 
 target_link_libraries(snake PRIVATE sfml-graphics sfml-window sfml-system)
-target_compile_options(snake PRIVATE -g -Wall -Wextra -pedantic )
+target_compile_options(snake PRIVATE -g -Wall -Wextra -pedantic)
 target_include_directories(snake PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/headers)

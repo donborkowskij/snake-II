@@ -1,16 +1,16 @@
 #include "Apple.h"
 
 Apple::Apple() {
-    Vector2f startingPosition(400, 300);
-    sprite.setSize(Vector2f(20, 20));
-    sprite.setFillColor(Color::Red);
-    sprite.setPosition(startingPosition);
+    sf::Vector2f startingPosition(400, 300);
+    mSprite.setSize(sf::Vector2f(20, 20));
+    mSprite.setFillColor(sf::Color::Red);
+    mSprite.setPosition(startingPosition);
 }
 
-void Apple::setPosition(Vector2f newPosition) {
-    sprite.setPosition(newPosition);
+void Apple::setPosition(sf::Vector2f newPosition) {
+    mSprite.setPosition(newPosition);
 }
 
-RectangleShape Apple::getSprite() {
-    return sprite;
+sf::RectangleShape Apple::getSprite() {
+    return mSprite;
 }

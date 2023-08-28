@@ -2,18 +2,22 @@
 
 #include <SFML/Graphics.hpp>
 
-using namespace sf;
 
 class Snake {
 public:
-    explicit Snake(Vector2f startPosition);
+    explicit Snake(sf::Vector2f startPosition);
+
     static void snakeColor(int a);
-    RectangleShape getShape();
-    Vector2f getPosition();
-    void setPosition(Vector2f newPosition);
+
+    sf::RectangleShape getShape();
+
+    sf::Vector2f getPosition();
+
+    void setPosition(sf::Vector2f newPosition);
+
     void update();
 
 private:
-    Vector2f position;
-    RectangleShape section;
+    sf::Vector2f position;
+    sf::RectangleShape section;
 };

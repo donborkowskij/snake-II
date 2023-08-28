@@ -2,14 +2,15 @@
 
 #include <SFML/Graphics.hpp>
 
-using namespace sf;
 
 class Apple {
 public:
     Apple();
-    void setPosition(Vector2f newPosition);
-    RectangleShape getSprite();
+
+    void setPosition(sf::Vector2f newPosition);
+
+    sf::RectangleShape getSprite();
 
 private:
-    RectangleShape sprite;
+    sf::RectangleShape mSprite;
 };

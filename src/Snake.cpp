@@ -2,23 +2,23 @@
 
 int a;
 
-Snake::Snake(Vector2f startPosition) {
-    section.setSize(Vector2f(20, 20));
+Snake::Snake(sf::Vector2f startPosition) {
+    section.setSize(sf::Vector2f(20, 20));
     switch (a) {
         case 0:
-            section.setFillColor(Color::Green);
+            section.setFillColor(sf::Color::Green);
             break;
         case 1:
-            section.setFillColor(Color::Red);
+            section.setFillColor(sf::Color::Red);
             break;
         case 2:
-            section.setFillColor(Color::Blue);
+            section.setFillColor(sf::Color::Blue);
             break;
         case 3:
-            section.setFillColor(Color::Yellow);
+            section.setFillColor(sf::Color::Yellow);
             break;
         default:
-            section.setFillColor(Color::Green);
+            section.setFillColor(sf::Color::Green);
             break;
     }
     //section.setFillColor(Color::Green);
@@ -30,15 +30,15 @@ void Snake::snakeColor(int b) {
     ::a = b;
 }
 
-Vector2f Snake::getPosition() {
+sf::Vector2f Snake::getPosition() {
     return position;
 }
 
-void Snake::setPosition(Vector2f newPosition) {
+void Snake::setPosition(sf::Vector2f newPosition) {
     position = newPosition;
 }
 
-RectangleShape Snake::getShape() {
+sf::RectangleShape Snake::getShape() {
     return section;
 }
 
