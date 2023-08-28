@@ -4,7 +4,6 @@
 const sf::Time Engine::TimePerFrame = sf::seconds(1.f / 60.f);
 
 Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
-
     try {
         if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
             throw "mFont not loaded!!!";
@@ -18,8 +17,6 @@ Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
     mParam->window->setFramerateLimit(FPS);
     maxLevels = 0;
     checkLevelFiles();
-
-//    startTheGame();
 
     setupText(&titleText, mFont, "Snake", 28, sf::Color::Blue);
     sf::FloatRect titleTextBounds = titleText.getLocalBounds();
@@ -54,123 +51,30 @@ Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
     pressSpaceText.setOutlineColor(sf::Color::Black);
     pressSpaceText.setOutlineThickness(2);
 
-//    dt = clock.restart();
     startTheGame();
 }
 
 void Engine::update(const sf::Time &deltaTime) {
-    timeSinceLastMove += deltaTime;
+    if (currentGameState != GameState::GAMEOVER) {
+        timeSinceLastMove += deltaTime;
 
-    //Update snake position
-    if (timeSinceLastMove.asSeconds() >= sf::seconds(1.f / float(speed)).asSeconds()) {
-        sf::Vector2f thisSectionPosition = snake[0].getPosition();
-        sf::Vector2f lastSectionPosition = thisSectionPosition;
+        if (timeSinceLastMove.asSeconds() >= sf::seconds(1.f / float(speed)).asSeconds()) {
+            sf::Vector2f thisSectionPosition = snake[0].getPosition();
+            sf::Vector2f lastSectionPosition = thisSectionPosition;
 
-        if (!directionQueue.empty()) {
-            auto newDirection = static_cast<Direction>(directionQueue.front());
-            //Make sure the snake doesn't go into apposite direction
-            switch (snakeDirection) {
-                case Direction::UP:
-                    snakeDirection = (newDirection != Direction::DOWN) ? newDirection : snakeDirection;
-                    break;
-                case Direction::DOWN:
-                    snakeDirection = (newDirection != Direction::UP) ? newDirection : snakeDirection;
-                    break;
-                case Direction::LEFT:
-                    snakeDirection = (newDirection != Direction::RIGHT) ? newDirection : snakeDirection;
-                    break;
-                case Direction::RIGHT:
-                    snakeDirection = (newDirection != Direction::LEFT) ? newDirection : snakeDirection;
-                    break;
-            }
-            directionQueue.pop_front();
+            handleDirectionChange();
+
+            updateScore();
+
+            updateSnake(thisSectionPosition, lastSectionPosition);
+
+            collisionWithApple();
+
+            collisionGameOver();
+
+            timeSinceLastMove = sf::Time::Zero;
         }
-
-        //Update Score
-        score += snake.size() + (applesEatenTotal + 1);
-        scoreText.setString(std::to_string(score));
-        sf::FloatRect scoreTextBounds = scoreText.getLocalBounds();
-        scoreText.setPosition(resolution.x - scoreTextBounds.width - 15, -9);
-
-        //Do we need to grow the snake
-        if (sectionsToAdd) {
-            addSnake();
-            sectionsToAdd--;
-        }
-
-        //Update snakes head position
-        switch (snakeDirection) {
-            case Direction::RIGHT:
-                snake[0].setPosition(sf::Vector2f(thisSectionPosition.x + 20, thisSectionPosition.y));
-                break;
-            case Direction::DOWN:
-                snake[0].setPosition(sf::Vector2f(thisSectionPosition.x, thisSectionPosition.y + 20));
-                break;
-            case Direction::LEFT:
-                snake[0].setPosition(sf::Vector2f(thisSectionPosition.x - 20, thisSectionPosition.y));
-                break;
-            case Direction::UP:
-                snake[0].setPosition(sf::Vector2f(thisSectionPosition.x, thisSectionPosition.y - 20));
-                break;
-        }
-
-        //Update snake tail position
-        for (int s = 1; s < snake.size(); s++) {
-            thisSectionPosition = snake[s].getPosition();
-            snake[s].setPosition(lastSectionPosition);
-            lastSectionPosition = thisSectionPosition;
-        }
-
-        // update snake functions
-        for (auto &s: snake) {
-            s.update();
-        }
-
-        //Collision detection with Apple
-        if (snake[0].getShape().getGlobalBounds().intersects(apple.getSprite().getGlobalBounds())) {
-            applesEatenThisLevel += 1;
-            applesEatenTotal += 1;
-            applesEatenText.setString("apples " + std::to_string(applesEatenTotal));
-            sf::FloatRect currentLevelTextBounds = currentLevelText.getGlobalBounds();
-            applesEatenText.setPosition(
-                    sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
-
-            //see if need to load new level
-            bool beginningNewLevel = false;
-            if (applesEatenThisLevel >= 10) {
-                //Begin the next level if there are more levels, else just play current level
-                if (currentLevel < maxLevels) {
-                    beginningNewLevel = true;
-                    beginNextLevel();
-                }
-            }
-            if (!beginningNewLevel) {
-                //We hit the apple, increase speed/snake size
-                sectionsToAdd += 4;
-                speed++;
-                moveApple();
-            }
-        }
-
-        //collision with snake body
-        for (int s = 1; s < snake.size(); s++) {
-            if (snake[0].getShape().getGlobalBounds().intersects(snake[s].getShape().getGlobalBounds())) {
-                //game over
-                currentGameState = GameState::GAMEOVER;
-            }
-        }
-
-        //Collision with wall
-        for (auto &w: wallSections) {
-            if (snake[0].getShape().getGlobalBounds().intersects(w.getShape().getGlobalBounds())) {
-                //Game over
-                currentGameState = GameState::GAMEOVER;
-            }
-        }
-
-        //Reset the last move timer
-        timeSinceLastMove = sf::Time::Zero;
-    }//END of if statement
+    }
 }
 
 void Engine::draw() {
@@ -390,22 +294,20 @@ void Engine::loadLevel(int levelNumber) {
 }
 
 void Engine::saveData() {
-    //load previous data
-
     std::ifstream saveFileProfile("assets/save/dataProfile.txt");
-    int a;//apples
+    int applesEaten;
     size_t highScore;
     int TotalApples;
     if (saveFileProfile.is_open()) {
-        saveFileProfile >> a >> highScore >> TotalApples;
-        std::cout << a << " " << highScore << " " << TotalApples << std::endl;
+        saveFileProfile >> applesEaten >> highScore >> TotalApples;
+        std::cout << applesEaten << " " << highScore << " " << TotalApples << std::endl;
         saveFileProfile.close();
     }
 
     //store new + old data
     std::ofstream saveProfile("assets/save/dataProfile.txt");
     if (saveProfile.is_open()) {
-        saveProfile << a + applesEatenTotal << std::endl;
+        saveProfile << applesEaten + applesEatenTotal << std::endl;
         if (highScore < score)
             saveProfile << score << std::endl;
         else saveProfile << highScore << std::endl;
@@ -413,7 +315,8 @@ void Engine::saveData() {
         if (TotalApples < applesEatenTotal) {
             saveProfile << applesEatenTotal;
         } else saveProfile << TotalApples;
-        std::cout << a + applesEatenTotal << " " << score << std::endl;
+        std::cout << applesEaten + applesEatenTotal << " " << score << std::endl;
+        std::cout << " yoppppppppppppppppppppppppppp" << std::endl;
         saveFileProfile.close();
     }
 }
@@ -424,6 +327,106 @@ void Engine::addDirection(int newDirection) {
     } else {
         if (directionQueue.back() != newDirection) {
             directionQueue.emplace_back(newDirection);
+        }
+    }
+}
+
+void Engine::handleDirectionChange() {
+    if (!directionQueue.empty()) {
+        auto newDirection = static_cast<Direction>(directionQueue.front());
+        switch (snakeDirection) {
+            case Direction::UP:
+                snakeDirection = (newDirection != Direction::DOWN) ? newDirection : snakeDirection;
+                break;
+            case Direction::DOWN:
+                snakeDirection = (newDirection != Direction::UP) ? newDirection : snakeDirection;
+                break;
+            case Direction::LEFT:
+                snakeDirection = (newDirection != Direction::RIGHT) ? newDirection : snakeDirection;
+                break;
+            case Direction::RIGHT:
+                snakeDirection = (newDirection != Direction::LEFT) ? newDirection : snakeDirection;
+                break;
+        }
+        directionQueue.pop_front();
+    }
+}
+
+void Engine::updateScore() {
+    score += snake.size() + (applesEatenTotal + 1);
+    scoreText.setString(std::to_string(score));
+    sf::FloatRect scoreTextBounds = scoreText.getLocalBounds();
+    scoreText.setPosition(resolution.x - scoreTextBounds.width - 15, -9);
+}
+
+void Engine::updateSnake(sf::Vector2f thisSectionPosition, sf::Vector2f lastSectionPosition) {
+    if (sectionsToAdd) {
+        addSnake();
+        sectionsToAdd--;
+    }
+
+    //Update snakes head position
+    switch (snakeDirection) {
+        case Direction::RIGHT:
+            snake[0].setPosition(sf::Vector2f(thisSectionPosition.x + 20, thisSectionPosition.y));
+            break;
+        case Direction::DOWN:
+            snake[0].setPosition(sf::Vector2f(thisSectionPosition.x, thisSectionPosition.y + 20));
+            break;
+        case Direction::LEFT:
+            snake[0].setPosition(sf::Vector2f(thisSectionPosition.x - 20, thisSectionPosition.y));
+            break;
+        case Direction::UP:
+            snake[0].setPosition(sf::Vector2f(thisSectionPosition.x, thisSectionPosition.y - 20));
+            break;
+    }
+
+    //Update snake tail position
+    for (int s = 1; s < snake.size(); s++) {
+        thisSectionPosition = snake[s].getPosition();
+        snake[s].setPosition(lastSectionPosition);
+        lastSectionPosition = thisSectionPosition;
+    }
+
+    for (auto &s: snake) {
+        s.update();
+    }
+}
+
+void Engine::collisionWithApple() {
+    if (snake[0].getShape().getGlobalBounds().intersects(apple.getSprite().getGlobalBounds())) {
+        applesEatenThisLevel += 1;
+        applesEatenTotal += 1;
+        applesEatenText.setString("apples " + std::to_string(applesEatenTotal));
+        sf::FloatRect currentLevelTextBounds = currentLevelText.getGlobalBounds();
+        applesEatenText.setPosition(
+                sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
+
+        bool beginningNewLevel = false;
+        if (applesEatenThisLevel >= 10) {
+            if (currentLevel < maxLevels) {
+                beginningNewLevel = true;
+                beginNextLevel();
+            }
+        }
+        if (!beginningNewLevel) {
+            sectionsToAdd += 4;
+            speed++;
+            moveApple();
+        }
+    }
+}
+
+void Engine::collisionGameOver() {
+    for (int s = 1; s < snake.size(); s++) {
+        if (snake[0].getShape().getGlobalBounds().intersects(snake[s].getShape().getGlobalBounds())) {
+            currentGameState = GameState::GAMEOVER;
+        }
+    }
+
+    for (auto &w: wallSections) {
+        if (snake[0].getShape().getGlobalBounds().intersects(w.getShape().getGlobalBounds())) {
+            currentGameState = GameState::GAMEOVER;
         }
     }
 }

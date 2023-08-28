@@ -15,13 +15,6 @@
 
 class Engine : public State {
 public:
-    enum Direction {
-        UP, RIGHT, DOWN, LEFT
-    };
-    enum GameState {
-        RUNNING, PAUSED, GAMEOVER
-    };
-
     Engine(std::shared_ptr<Param> param);
 
     void update(const sf::Time &deltaTime) override;
@@ -30,43 +23,19 @@ public:
 
     void input() override;
 
-    static void
-    setupText(sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour);
-
-//    void input();
-
-    void addDirection(int newDirection);
-
-//    void update();
-
-//    void draw();
-
-    void newSnake();
-
-    void addSnake();
-
-    void moveApple();
-
-    void checkLevelFiles();
-
-    void loadLevel(int levelNumber);
-
-    void beginNextLevel();
-
-    void startTheGame();
-
-    void togglePause();
-
-    void saveData();
-
-//    void run();
-
 private:
+    enum Direction {
+        UP, RIGHT, DOWN, LEFT
+    };
+    enum GameState {
+        RUNNING, PAUSED, GAMEOVER
+    };
+
     std::shared_ptr<Param> mParam;
     sf::Vector2f resolution;
-//    RenderWindow window;
     const unsigned int FPS = 60;
     static const sf::Time TimePerFrame;
+    sf::Time timeSinceLastMove;
 
     std::vector<Snake> snake;
 
@@ -94,11 +63,41 @@ private:
     sf::Text pressSpaceText;
     sf::Text quitToMenuText;
 
-    sf::Time timeSinceLastMove;
+
 
     int currentGameState;
     int lastGameState;
 
-    sf::Clock clock;
-    sf::Time dt;
+    static void
+    setupText(sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour);
+
+    void addDirection(int newDirection);
+
+    void newSnake();
+
+    void addSnake();
+
+    void moveApple();
+
+    void checkLevelFiles();
+
+    void loadLevel(int levelNumber);
+
+    void beginNextLevel();
+
+    void startTheGame();
+
+    void togglePause();
+
+    void saveData();
+
+    void handleDirectionChange();
+
+    void updateScore();
+
+    void updateSnake(sf::Vector2f thisSectionPosition, sf::Vector2f lastSectionPosition);
+
+    void collisionWithApple();
+
+    void collisionGameOver();
 };
