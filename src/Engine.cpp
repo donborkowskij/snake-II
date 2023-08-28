@@ -245,7 +245,7 @@ void Engine::input() {
 void Engine::startTheGame() {
 
     score = 0;
-    speed = 10;
+    speed = 5;
     snakeDirection = Direction::RIGHT;
     timeSinceLastMove = sf::Time::Zero;
 

@@ -45,7 +45,7 @@ private:
 
     void loadData();
 
-    void saveBought(int GreenSnake, int RedSnake, int BlueSnake, int YellowSnake);
+    void saveBought(int array[]);
 
     void saveData();
 

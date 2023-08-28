@@ -124,12 +124,14 @@ void Shop::handleShopSelection() {
 }
 
 void Shop::buySnakeColor(int colorIndex, int price) {
+    int array[4] = {};
+    array[colorIndex] = 1;
     if (returnBought(colorIndex) == 1) {
         snakeColorBuy(colorIndex);
     } else if (::Shop_currency >= price) {
         ::Shop_currency -= price;
         snakeColorBuy(colorIndex);
-        saveBought(colorIndex);
+        saveBought(array);
         saveData();
     }
 }
@@ -228,7 +230,7 @@ int Shop::returnBought(int number) {
     return 0;
 }
 
-void Shop::saveBought(int a, int b, int c, int d) {
+void Shop::saveBought(int array[]) {
     int GreenSnake = 0;
     int RedSnake = 0;
     int BlueSnake = 0;
@@ -244,25 +246,25 @@ void Shop::saveBought(int a, int b, int c, int d) {
     //store new + old data
     std::ofstream saveProfile("assets/save/Bought.txt", std::ofstream::trunc);
     if (saveProfile.is_open()) {
-        if (GreenSnake >= a) {
+        if (GreenSnake >= array[0]) {
             saveProfile << GreenSnake << std::endl;
         } else {
-            saveProfile << a << std::endl;
+            saveProfile << array[0] << std::endl;
         }
-        if (RedSnake >= b) {
+        if (RedSnake >= array[1]) {
             saveProfile << RedSnake << std::endl;
         } else {
-            saveProfile << b << std::endl;
+            saveProfile << array[1] << std::endl;
         }
-        if (a != BlueSnake) {
+        if (array[0] != BlueSnake) {
             saveProfile << BlueSnake << std::endl;
         } else {
-            saveProfile << c << std::endl;
+            saveProfile << array[2] << std::endl;
         }
-        if (a != YellowSnake) {
+        if (array[0] != YellowSnake) {
             saveProfile << YellowSnake << std::endl;
         } else {
-            saveProfile << d << std::endl;
+            saveProfile << array[3] << std::endl;
         }
         saveProfile.close();
     }
