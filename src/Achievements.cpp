@@ -98,26 +98,28 @@ void Achievements::draw() {
 }
 
 void Achievements::input() {
-    sf::Event event{};
+    sf::Event event;
     while (mParam->window->pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
-            mParam->window->close();
+        switch (event.type) {
+            case sf::Event::Closed:
+                mParam->window->close();
+                break;
+            case sf::Event::KeyReleased:
+                handleKeyInput(event.key.code);
+                break;
+            default:
+                break;
         }
-        if (event.type == sf::Event::KeyReleased) {
-            if (event.key.code == sf::Keyboard::Down) {
-                if (::ShopSelect != 12) {
-                    ::ShopSelect += 4;
-                }
-            }
-            if (event.key.code == sf::Keyboard::Up) {
-                if (::ShopSelect != 0) {
-                    ::ShopSelect -= 4;
-                }
-            }
-            if (event.key.code == sf::Keyboard::Q) {
-                mParam->states->add(std::make_unique<MainMenu>(mParam));
-            }
-        }
+    }
+}
+
+void Achievements::handleKeyInput(sf::Keyboard::Key keyCode) {
+    if (keyCode == sf::Keyboard::Down && ::ShopSelect != 12) {
+        ::ShopSelect += 4;
+    } else if (keyCode == sf::Keyboard::Up && ::ShopSelect != 0) {
+        ::ShopSelect -= 4;
+    } else if (keyCode == sf::Keyboard::Q) {
+        mParam->states->add(std::make_unique<MainMenu>(mParam));
     }
 }
 

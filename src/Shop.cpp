@@ -73,67 +73,64 @@ void Shop::draw() {
 }
 
 void Shop::input() {
-    sf::Event event{};
+    sf::Event event;
     while (mParam->window->pollEvent(event)) {
-        if (event.type == sf::Event::Closed) {
-            mParam->window->close();
+        switch (event.type) {
+            case sf::Event::Closed:
+                mParam->window->close();
+                break;
+
+            case sf::Event::KeyReleased:
+                handleKeyInput(event.key.code);
+                break;
+
+            default:
+                break;
         }
-        if (event.type == sf::Event::KeyReleased) {
-            if (event.key.code == sf::Keyboard::Down) {
-                moveDown();
-            }
-            if (event.key.code == sf::Keyboard::Up) {
-                moveUp();
-            }
-            if (event.key.code == sf::Keyboard::Q) {
-                mParam->states->add(std::make_unique<MainMenu>(mParam), true);
-            }
-            if (event.key.code == sf::Keyboard::Return) {
-                switch (mShopSelect) {
-                    case 0:
-                        if (returnBought(0) == 1) {
-                            snakeColorBuy(0);
-                        } else if (::Shop_currency >= 25) {
-                            ::Shop_currency -= 25;
-                            //cout << ::Shop_currency;
-                            snakeColorBuy(0);
-                            saveBought(1, 0, 0, 0);
-                            saveData();
-                        }
-                        break;
-                    case 1:
-                        if (returnBought(1) == 1) {
-                            snakeColorBuy(1);
-                        } else if (::Shop_currency >= 25) {
-                            ::Shop_currency -= 25;
-                            snakeColorBuy(1);
-                            saveBought(0, 1, 0, 0);
-                            saveData();
-                        }
-                        break;
-                    case 2:
-                        if (returnBought(2) == 1) {
-                            snakeColorBuy(2);
-                        } else if (::Shop_currency >= 25) {
-                            ::Shop_currency -= 25;
-                            snakeColorBuy(2);
-                            saveBought(0, 0, 1, 0);
-                            saveData();
-                        }
-                        break;
-                    case 3:
-                        if (returnBought(3) == 1) {
-                            snakeColorBuy(3);
-                        } else if (::Shop_currency >= 50) {
-                            ::Shop_currency -= 50;
-                            snakeColorBuy(3);
-                            saveBought(0, 0, 0, 1);
-                            saveData();
-                        }
-                        break;
-                }
-            }
-        }
+    }
+}
+
+void Shop::handleKeyInput(sf::Keyboard::Key keyCode) {
+    if (keyCode == sf::Keyboard::Down) {
+        moveDown();
+    } else if (keyCode == sf::Keyboard::Up) {
+        moveUp();
+    } else if (keyCode == sf::Keyboard::Q) {
+        returnToMainMenu();
+    } else if (keyCode == sf::Keyboard::Return) {
+        handleShopSelection();
+    }
+}
+
+void Shop::returnToMainMenu() {
+    mParam->states->add(std::make_unique<MainMenu>(mParam), true);
+}
+
+void Shop::handleShopSelection() {
+    switch (mShopSelect) {
+        case 0:
+            buySnakeColor(0, 25);
+            break;
+        case 1:
+            buySnakeColor(1, 25);
+            break;
+        case 2:
+            buySnakeColor(2, 25);
+            break;
+        case 3:
+            buySnakeColor(3, 50);
+            break;
+    }
+}
+
+void Shop::buySnakeColor(int colorIndex, int price) {
+    if (returnBought(colorIndex) == 1) {
+        snakeColorBuy(colorIndex);
+    } else if (::Shop_currency >= price) {
+        ::Shop_currency -= price;
+        snakeColorBuy(colorIndex);
+        saveBought(colorIndex);
+        saveData();
     }
 }
 

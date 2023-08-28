@@ -50,4 +50,12 @@ private:
     void saveData();
 
     void snakeColorBuy(int a);
+
+    void handleKeyInput(sf::Keyboard::Key keyCode);
+
+    void returnToMainMenu();
+
+    void handleShopSelection();
+
+    void buySnakeColor(int colorIndex, int price);
 };

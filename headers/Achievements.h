@@ -6,12 +6,6 @@
 
 #define ACHIEVEMENT_ELEMENTS 16
 
-struct TextInfo {
-    std::string string;
-    int characterSize;
-    sf::Vector2f position;
-    sf::Color fillColor;
-};
 
 class Achievements : public State {
 public:
@@ -43,4 +37,13 @@ private:
     sf::Sprite mBgImage;
 
     void dataHandling();
+
+    void handleKeyInput(sf::Keyboard::Key keyCode);
+
+    struct TextInfo {
+        std::string string;
+        int characterSize;
+        sf::Vector2f position;
+        sf::Color fillColor;
+    };
 };
