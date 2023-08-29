@@ -20,6 +20,12 @@ public:
     void input() override;
 
 private:
+    void moveUp();
+
+    void moveDown();
+
+    void print(std::unique_ptr<sf::RenderWindow> &window);
+
     std::shared_ptr<Param> mParam;
     sf::Sprite mBgImage;
     sf::Texture mBackground;
@@ -28,10 +34,4 @@ private:
     const sf::Color mFillColor = sf::Color(255, 204, 153);
     int mMainMenuSelect;
     int mFontSize = 50;
-
-    void moveUp();
-
-    void moveDown();
-
-    void print(std::unique_ptr<sf::RenderWindow> &window);
 };

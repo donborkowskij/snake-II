@@ -1,19 +1,15 @@
 #include "Achievements.h"
-#include "iostream"
+#include <iostream>
 
 Achievements::Achievements(std::shared_ptr<Param> param) : mParam(param) {
-    try {
-        if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
-            throw "mFont not loaded!!!";
-        }
-    }
-    catch (const char *txtE) {
-        std::cout << "Exception: " << txtE << std::endl;
+    if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
+        std::cerr << "mFont not loaded!!!";
+        std::exit(EXIT_FAILURE);
     }
 
     loadData();
 
-    TextInfo achiveTextInfo[] = {
+    TextInfo achieveTextInfo[] = {
             {"Apple I",         35, sf::Vector2f(75, 110), mGrayColor},
             {"Apple II",        35, sf::Vector2f(75, 220), mGrayColor},
             {"Apple III",       35, sf::Vector2f(75, 330), mGrayColor},
@@ -52,17 +48,17 @@ Achievements::Achievements(std::shared_ptr<Param> param) : mParam(param) {
     };
 
     TextInfo extraTextInfo[] = {
-            {"Press Q to quit to Main menu",                     30, sf::Vector2f(420, 560), mOrangeColor},
-            {"Most apples eaten: " + std::to_string(mTotalApples),  40, sf::Vector2f(75, 5),    mOrangeColor},
-            {"Your highest score: " + std::to_string(mMyScore), 40, sf::Vector2f(75, 45),   mOrangeColor},
+            {"Press Q to quit to Main menu",                       30, sf::Vector2f(420, 560), mOrangeColor},
+            {"Most apples eaten: " + std::to_string(mTotalApples), 40, sf::Vector2f(75, 5),    mOrangeColor},
+            {"Your highest score: " + std::to_string(mMyScore),    40, sf::Vector2f(75, 45),   mOrangeColor},
     };
 
     for (int i = 0; i < ACHIEVEMENT_ELEMENTS; ++i) {
         mAchiveText[i].setFont(mFont);
-        mAchiveText[i].setFillColor(achiveTextInfo[i].fillColor);
-        mAchiveText[i].setString(achiveTextInfo[i].string);
-        mAchiveText[i].setCharacterSize(achiveTextInfo[i].characterSize);
-        mAchiveText[i].setPosition(achiveTextInfo[i].position);
+        mAchiveText[i].setFillColor(achieveTextInfo[i].fillColor);
+        mAchiveText[i].setString(achieveTextInfo[i].string);
+        mAchiveText[i].setCharacterSize(achieveTextInfo[i].characterSize);
+        mAchiveText[i].setPosition(achieveTextInfo[i].position);
 
         mTextChild[i].setFont(mFont);
         mTextChild[i].setFillColor(textChildInfo[i].fillColor);
@@ -185,6 +181,7 @@ void Achievements::loadData() {
         std::cout << "ACHIVE function" << std::endl;
         saveFileProfile >> mTotalApples >> mMyApples >> mMyScore;
         saveFileProfile.close();
-        std::cout << "mTotalApples: "<< mTotalApples << " mMyApples: "<< mMyApples << " mMyScore: " << mMyScore << std::endl;
+        std::cout << "mTotalApples: " << mTotalApples << " mMyApples: " << mMyApples << " mMyScore: " << mMyScore
+                  << std::endl;
     }
 }

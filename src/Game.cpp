@@ -3,7 +3,7 @@
 
 
 Game::Game() : mParam(std::make_shared<Param>()) {
-    mParam->window->create(sf::VideoMode(800, 600), "Snake2", sf::Style::Close);
+    mParam->window->create(sf::VideoMode(800, 600), "SnakeII", sf::Style::Close);
     mParam->states->add(std::make_unique<MainMenu>(mParam));
 
     sf::Clock clock;

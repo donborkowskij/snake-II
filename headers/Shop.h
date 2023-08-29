@@ -20,6 +20,30 @@ public:
     void input() override;
 
 private:
+    void loadBought();
+
+    void loadCurrency();
+
+    void buySnakeColor(int colorIndex, int price);
+
+    void saveBought();
+
+    void saveData();
+
+    void moveUp();
+
+    void moveDown();
+
+    void print(std::unique_ptr<sf::RenderWindow> &window);//-
+
+    void drawExtra(std::unique_ptr<sf::RenderWindow> &window);
+
+    void handleKeyInput(sf::Keyboard::Key keyCode);
+
+    void returnToMainMenu();
+
+    void handleShopSelection();
+
     std::shared_ptr<Param> mParam;
     sf::Sprite mBgImage;
     sf::Texture mBackground;
@@ -35,28 +59,4 @@ private:
 
     int mShopCurrency;
     int mEquipped;
-//------------------------
-    void loadBought();//+
-
-    void loadCurrency();//+
-
-    void buySnakeColor(int colorIndex, int price);//+
-
-    void saveBought();//+
-
-    void saveData();//+
-//--------------------
-    void moveUp();
-
-    void moveDown();
-
-    void print(std::unique_ptr<sf::RenderWindow> &window);//-
-
-    void drawExtra(std::unique_ptr<sf::RenderWindow> &window);
-
-    void handleKeyInput(sf::Keyboard::Key keyCode);
-
-    void returnToMainMenu();
-
-    void handleShopSelection();
 };

@@ -9,17 +9,16 @@ class Snake {
 public:
     explicit Snake(sf::Vector2f startPosition);
 
-    sf::RectangleShape getShape();
-
-    sf::Vector2f getPosition();
-
     void setPosition(sf::Vector2f newPosition);
 
     void update();
 
+    sf::RectangleShape getShape();
+
+    sf::Vector2f getPosition();
+
 private:
+    static void loadSnakeColor(sf::RectangleShape &section);
     sf::Vector2f position;
     sf::RectangleShape section;
-
-    static void loadSnakeColor(sf::RectangleShape &section);
 };

@@ -24,6 +24,45 @@ public:
     void input() override;
 
 private:
+    static void setupText(sf::Text *textItem,
+                          const sf::Font &font,
+                          const sf::String &value,
+                          int size,
+                          sf::Color colour);
+
+    void addDirection(int newDirection);
+
+    void newSnake();
+
+    void addSnake();
+
+    void moveApple();
+
+    void checkLevelFiles();
+
+    void loadLevel(int levelNumber);
+
+    void beginNextLevel();
+
+    void startTheGame();
+
+    void togglePause();
+
+    void saveData() const;
+
+    void handleDirectionChange();
+
+    void updateScore();
+
+    void updateSnake(sf::Vector2f thisSectionPosition,
+                     sf::Vector2f lastSectionPosition);
+
+    void collisionWithApple();
+
+    void collisionGameOver();
+
+    void toggleGameOver();
+
     enum Direction {
         UP, RIGHT, DOWN, LEFT
     };
@@ -64,39 +103,4 @@ private:
 
     int currentGameState;
     int lastGameState;
-
-    static void
-    setupText(sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour);
-
-    void addDirection(int newDirection);
-
-    void newSnake();
-
-    void addSnake();
-
-    void moveApple();
-
-    void checkLevelFiles();
-
-    void loadLevel(int levelNumber);
-
-    void beginNextLevel();
-
-    void startTheGame();
-
-    void togglePause();
-
-    void saveData() const;
-
-    void handleDirectionChange();
-
-    void updateScore();
-
-    void updateSnake(sf::Vector2f thisSectionPosition, sf::Vector2f lastSectionPosition);
-
-    void collisionWithApple();
-
-    void collisionGameOver();
-
-    void toggleGameOver();
 };

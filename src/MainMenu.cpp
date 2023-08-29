@@ -63,15 +63,12 @@ void MainMenu::input() {
                 switch (mMainMenuSelect) {
                     case 0:
                         mParam->states->add(std::make_unique<Engine>(mParam));
-//                        runSnake();
                         break;
                     case 1:
-//                        mParam->window->close();
                         mParam->states->add(std::make_unique<Shop>(mParam));
                         break;
                     case 2:
                         mParam->states->add(std::make_unique<Achievements>(mParam));
-//                        runAchievements();
                         break;
                     case 3:
                         mParam->window->close();

@@ -1,14 +1,10 @@
 #include "Engine.h"
-#include "iostream"
+#include <iostream>
 
 Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
-    try {
-        if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
-            throw "mFont not loaded!!!";
-        }
-    }
-    catch (const char *txtE) {
-        std::cout << "Exception: " << txtE << std::endl;
+    if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
+        std::cerr << "mFont not loaded!!!";
+        std::exit(EXIT_FAILURE);
     }
 
     resolution = sf::Vector2f(800, 600);
@@ -19,7 +15,7 @@ Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
     sf::FloatRect textBounds;
 
     // Title Text
-    setupText(&titleText, mFont, "Snake", 28, sf::Color::Blue);
+    setupText(&titleText, mFont, "Snake II", 28, sf::Color::Blue);
     textBounds = titleText.getLocalBounds();
     titleText.setPosition(sf::Vector2f(resolution.x / 2 - textBounds.width / 2, -9));
 
@@ -320,35 +316,25 @@ void Engine::saveData() const {
     size_t highScore;
     if (loadFile.is_open()) {
         loadFile >> TotalApples >> applesEaten >> highScore;
-        std::cout << applesEaten << " " << highScore << " " << TotalApples << std::endl;
         loadFile.close();
     }
 
     std::ofstream saveProfile("assets/save/dataProfile.txt");
     if (saveProfile.is_open()) {
-        std::cout << "Engine function" << std::endl;
         saveProfile << (applesEaten + applesEatenTotal) << std::endl;
-        std::cout << (applesEaten + applesEatenTotal);
-        std::cout << " ";
 
         if (TotalApples < applesEatenTotal) {
             saveProfile << applesEatenTotal << std::endl;
-            std::cout << applesEatenTotal;
-            std::cout << " ";
         }
         else {
             saveProfile << TotalApples << std::endl;
-            std::cout << TotalApples;
-            std::cout << " ";
         }
 
         if (highScore < score) {
             saveProfile << score << std::endl;
-            std::cout << score << std::endl;
         }
         else {
             saveProfile << highScore;
-            std::cout << highScore << std::endl;
         }
         saveProfile.close();
     }

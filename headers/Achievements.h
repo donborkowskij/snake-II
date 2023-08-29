@@ -18,6 +18,16 @@ public:
     void input() override;
 
 private:
+    void loadData();
+
+    void handleKeyInput(sf::Keyboard::Key keyCode);
+
+    void color(int i);
+
+    void screen(std::unique_ptr<sf::RenderWindow> &window, int i);
+
+    void brain();
+
     std::shared_ptr<Param> mParam;
     sf::Font mFont;
     sf::Text mAchiveText[ACHIEVEMENT_ELEMENTS];
@@ -33,16 +43,6 @@ private:
     int mMyScore;
     int mTotalApples;
     int mShopSelect = 0;
-
-    void loadData();
-
-    void handleKeyInput(sf::Keyboard::Key keyCode);
-
-    void color(int i);
-
-    void screen(std::unique_ptr<sf::RenderWindow> &window, int i);
-
-    void brain();
 
     struct TextInfo {
         std::string string;
