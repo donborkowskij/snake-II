@@ -20,6 +20,8 @@ public:
 
     ~Game();
 
+    void run();
+
 private:
     const sf::Time SECONDS_PER_FRAME = sf::seconds(1.f / 60.f);
     std::shared_ptr<Param> mParam;

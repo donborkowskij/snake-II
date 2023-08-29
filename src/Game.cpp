@@ -6,7 +6,9 @@ Game::Game() : mParam(std::make_shared<Param>()) {
     mParam->window->create(sf::VideoMode(800, 600), "SnakeII", sf::Style::Close);
     mParam->states->add(std::make_unique<MainMenu>(mParam));
     mParam->window->setFramerateLimit(60);
+}
 
+void Game::run() {
     sf::Clock clock;
     sf::Time timeSinceLastFrame = sf::Time::Zero;
 
