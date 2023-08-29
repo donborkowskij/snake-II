@@ -17,12 +17,6 @@ public:
 
     void input() override;
 
-    void color(int i);
-
-    void screen(std::unique_ptr<sf::RenderWindow> &window, int i);
-
-    void brain();
-
 private:
     std::shared_ptr<Param> mParam;
     sf::Font mFont;
@@ -43,6 +37,12 @@ private:
     void loadData();
 
     void handleKeyInput(sf::Keyboard::Key keyCode);
+
+    void color(int i);
+
+    void screen(std::unique_ptr<sf::RenderWindow> &window, int i);
+
+    void brain();
 
     struct TextInfo {
         std::string string;

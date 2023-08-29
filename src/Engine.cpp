@@ -129,10 +129,11 @@ void Engine::input() {
             }
 
             if (currentGameState == GameState::GAMEOVER) {
-                saveData();
                 if (event.key.code == sf::Keyboard::Space) {
+                    saveData();
                     startTheGame();
                 } else if (event.key.code == sf::Keyboard::Q) {
+                    saveData();
                     mParam->states->add(std::make_unique<MainMenu>(mParam));
                 }
             }
@@ -312,31 +313,44 @@ void Engine::loadLevel(int levelNumber) {
     level.close();
 }
 
-void Engine::saveData() {
-    std::ifstream saveFileProfile("assets/save/dataProfile.txt");
+void Engine::saveData() const {
+    std::ifstream loadFile("assets/save/dataProfile.txt");
+    int TotalApples;
     int applesEaten;
     size_t highScore;
-    int TotalApples;
-    if (saveFileProfile.is_open()) {
-        saveFileProfile >> TotalApples >> applesEaten >> highScore;
+    if (loadFile.is_open()) {
+        loadFile >> TotalApples >> applesEaten >> highScore;
         std::cout << applesEaten << " " << highScore << " " << TotalApples << std::endl;
-        saveFileProfile.close();
+        loadFile.close();
     }
 
     std::ofstream saveProfile("assets/save/dataProfile.txt");
     if (saveProfile.is_open()) {
-        saveProfile << applesEaten + applesEatenTotal << std::endl;
+        std::cout << "Engine function" << std::endl;
+        saveProfile << (applesEaten + applesEatenTotal) << std::endl;
+        std::cout << (applesEaten + applesEatenTotal);
+        std::cout << " ";
 
-        if (TotalApples < applesEatenTotal)
-            saveProfile << applesEatenTotal;
-        else
-            saveProfile << TotalApples;
+        if (TotalApples < applesEatenTotal) {
+            saveProfile << applesEatenTotal << std::endl;
+            std::cout << applesEatenTotal;
+            std::cout << " ";
+        }
+        else {
+            saveProfile << TotalApples << std::endl;
+            std::cout << TotalApples;
+            std::cout << " ";
+        }
 
-        if (highScore < score)
-            saveProfile << score;
-        else
+        if (highScore < score) {
+            saveProfile << score << std::endl;
+            std::cout << score << std::endl;
+        }
+        else {
             saveProfile << highScore;
-        saveFileProfile.close();
+            std::cout << highScore << std::endl;
+        }
+        saveProfile.close();
     }
 }
 
@@ -401,7 +415,7 @@ void Engine::updateSnake(sf::Vector2f thisSectionPosition, sf::Vector2f lastSect
     }
 
     //Update snake tail position
-    for (int s = 1; s < snake.size(); s++) {
+    for (size_t s = 1; s < snake.size(); s++) {
         thisSectionPosition = snake[s].getPosition();
         snake[s].setPosition(lastSectionPosition);
         lastSectionPosition = thisSectionPosition;
@@ -437,15 +451,19 @@ void Engine::collisionWithApple() {
 }
 
 void Engine::collisionGameOver() {
-    for (int s = 1; s < snake.size(); s++) {
+    for (size_t s = 1; s < snake.size(); s++) {
         if (snake[0].getShape().getGlobalBounds().intersects(snake[s].getShape().getGlobalBounds())) {
-            currentGameState = GameState::GAMEOVER;
+            toggleGameOver();
         }
     }
 
     for (auto &w: wallSections) {
         if (snake[0].getShape().getGlobalBounds().intersects(w.getShape().getGlobalBounds())) {
-            currentGameState = GameState::GAMEOVER;
+            toggleGameOver();
         }
     }
+}
+
+void Engine::toggleGameOver() {
+    currentGameState = GameState::GAMEOVER;
 }

@@ -53,8 +53,8 @@ Achievements::Achievements(std::shared_ptr<Param> param) : mParam(param) {
 
     TextInfo extraTextInfo[] = {
             {"Press Q to quit to Main menu",                     30, sf::Vector2f(420, 560), mOrangeColor},
-            {"Most apples eaten: " + std::to_string(mMyApples),  40, sf::Vector2f(75, 5),    mOrangeColor},
-            {"Your highest score: " + std::to_string(mMyApples), 40, sf::Vector2f(75, 45),   mOrangeColor},
+            {"Most apples eaten: " + std::to_string(mTotalApples),  40, sf::Vector2f(75, 5),    mOrangeColor},
+            {"Your highest score: " + std::to_string(mMyScore), 40, sf::Vector2f(75, 45),   mOrangeColor},
     };
 
     for (int i = 0; i < ACHIEVEMENT_ELEMENTS; ++i) {
@@ -182,9 +182,9 @@ void Achievements::loadData() {
     std::ifstream saveFileProfile("assets/save/dataProfile.txt");
 
     if (saveFileProfile.is_open()) {
+        std::cout << "ACHIVE function" << std::endl;
         saveFileProfile >> mTotalApples >> mMyApples >> mMyScore;
         saveFileProfile.close();
+        std::cout << "mTotalApples: "<< mTotalApples << " mMyApples: "<< mMyApples << " mMyScore: " << mMyScore << std::endl;
     }
-    mExtraText[1].setString("Most apples eaten: " + std::to_string(mMyApples));
-    mExtraText[2].setString("Your highest score: " + std::to_string(mMyScore));
 }

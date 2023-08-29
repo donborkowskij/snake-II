@@ -86,7 +86,7 @@ private:
 
     void togglePause();
 
-    void saveData();
+    void saveData() const;
 
     void handleDirectionChange();
 
@@ -97,4 +97,6 @@ private:
     void collisionWithApple();
 
     void collisionGameOver();
+
+    void toggleGameOver();
 };
