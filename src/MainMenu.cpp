@@ -10,7 +10,7 @@ MainMenu::MainMenu(std::shared_ptr<Param> param) : mParam(param) {
         std::exit(EXIT_FAILURE);
     }
 
-    sf::String menuOptions[MENU_ELEMENTS]{"Play", "Store", "Achievements", "Quit"};
+    sf::String menuOptions[MENU_ELEMENTS]{"Play", "Shop", "Achievements", "Quit"};
     float position = 100;
 
     //menu buttons

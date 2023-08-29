@@ -8,7 +8,6 @@
 
 #define MENU_ELEMENTS 4
 
-
 class MainMenu : public State {
 public:
     explicit MainMenu(std::shared_ptr<Param> param);

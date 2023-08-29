@@ -4,7 +4,6 @@ StateManager::StateManager() : mAdd(false), mDelete(false), mReplace(false) {}
 
 StateManager::~StateManager() {}
 
-
 void StateManager::pop() {
     mDelete = true;
 }

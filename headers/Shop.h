@@ -6,7 +6,6 @@
 #include "Snake.h"
 #include "State.h"
 
-
 #define SHOP_ELEMENTS 4
 
 class Shop : public State {

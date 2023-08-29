@@ -58,24 +58,26 @@ Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
 }
 
 void Engine::update(const sf::Time &deltaTime) {
-    if (mCurrentGameState != GameState::GAMEOVER) {
-        mTimeSinceLastMove += deltaTime;
+    if (mCurrentGameState != GameState::PAUSED) {
+        if (mCurrentGameState != GameState::GAMEOVER) {
+            mTimeSinceLastMove += deltaTime;
 
-        if (mTimeSinceLastMove.asSeconds() >= sf::seconds(1.f / float(mSpeed)).asSeconds()) {
-            sf::Vector2f thisSectionPosition = mSnake[0].getPosition();
-            sf::Vector2f lastSectionPosition = thisSectionPosition;
+            if (mTimeSinceLastMove.asSeconds() >= sf::seconds(1.f / float(mSpeed)).asSeconds()) {
+                sf::Vector2f thisSectionPosition = mSnake[0].getPosition();
+                sf::Vector2f lastSectionPosition = thisSectionPosition;
 
-            handleDirectionChange();
+                handleDirectionChange();
 
-            updateScore();
+                updateScore();
 
-            updateSnake(thisSectionPosition, lastSectionPosition);
+                updateSnake(thisSectionPosition, lastSectionPosition);
 
-            collisionWithApple();
+                collisionWithApple();
 
-            collisionGameOver();
+                collisionGameOver();
 
-            mTimeSinceLastMove = sf::Time::Zero;
+                mTimeSinceLastMove = sf::Time::Zero;
+            }
         }
     }
 }

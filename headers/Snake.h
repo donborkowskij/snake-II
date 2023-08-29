@@ -4,7 +4,6 @@
 #include <iostream>
 #include <fstream>
 
-
 class Snake {
 public:
     explicit Snake(sf::Vector2f startPosition);

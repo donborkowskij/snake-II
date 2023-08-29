@@ -2,7 +2,6 @@
 
 #include <SFML/System/Time.hpp>
 
-
 class State {
 public:
     State() {};

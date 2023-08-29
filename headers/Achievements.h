@@ -6,7 +6,6 @@
 
 #define ACHIEVEMENT_ELEMENTS 16
 
-
 class Achievements : public State {
 public:
     Achievements(std::shared_ptr<Param> param);

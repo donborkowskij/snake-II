@@ -4,7 +4,6 @@
 #include <memory>
 #include "State.h"
 
-
 class StateManager {
 public:
     StateManager();
