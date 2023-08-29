@@ -1,40 +1,36 @@
-//
-// Created by marki on 2021-06-02.
-//
+#pragma once
 
-#ifndef FIRSTPROG_MAINMENU_H
-#define FIRSTPROG_MAINMENU_H
-
+#include <memory>
 #include <SFML/Graphics.hpp>
+#include "State.h"
+#include "Game.h"
 #include "Engine.h"
 
-//Edit if you want to add more elements
-#define max_main_menu 4
+#define MENU_ELEMENTS 4
 
+class MainMenu : public State {
+public:
+    explicit MainMenu(std::shared_ptr<Param> param);
 
-class MainMenu {
-    private:
-        int mainMenuSelect;
-        sf::Font font;
-        sf::Text mainMenu[max_main_menu];
-    public:
-        void Menu();
+    void update(const sf::Time &deltaTime) override;
 
-        void Draw(sf::RenderWindow &window);
-        void moveUp();
-        void moveDown();
+    void draw() override;
 
-        //ToDo: Add move Main Menu navigation options (?)
-        //void moveLeft();
-        //void moveRight();
-        void MenuRun();
-        void RunSnake();
-        void RunShop();
-        void RunAchievements();
+    void input() override;
 
+private:
+    void moveUp();
 
-    //void runMenu();
+    void moveDown();
+
+    void print(std::unique_ptr<sf::RenderWindow> &window);
+
+    std::shared_ptr<Param> mParam;
+    sf::Sprite mBgImage;
+    sf::Texture mBackground;
+    sf::Font mFont;
+    sf::Text mMainMenu[MENU_ELEMENTS];
+    const sf::Color mFillColor = sf::Color(255, 204, 153);
+    int mMainMenuSelect;
+    int mFontSize = 50;
 };
-
-
-#endif //FIRSTPROG_MAINMENU_H

@@ -1,15 +1,11 @@
-//
-// Created by donat on 5/31/2021.
-//
-
 #include "Wall.h"
 
-Wall::Wall(Vector2f position, Vector2f size) {
+Wall::Wall(sf::Vector2f position, sf::Vector2f size) {
     wallShape.setSize(size);
-    wallShape.setFillColor(Color::White);
+    wallShape.setFillColor(sf::Color::White);
     wallShape.setPosition(position);
 }
 
-RectangleShape Wall::getShape() {
+sf::RectangleShape Wall::getShape() {
     return wallShape;
 }

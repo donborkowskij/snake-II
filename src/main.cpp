@@ -1,10 +1,9 @@
 #include <SFML/Graphics.hpp>
-#include "MainMenu.h"
-
+#include "Game.h"
 
 int main() {
-    MainMenu menu;
-    menu.Menu();
+    Game game;
+    game.run();
 
     return 0;
 }

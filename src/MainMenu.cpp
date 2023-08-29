@@ -2,147 +2,102 @@
 #include "Shop.h"
 #include "MainMenu.h"
 #include "Achievements.h"
-#include "iostream"
+#include <iostream>
 
-
-
-void MainMenu::Menu() {
-
-
-    if(!font.loadFromFile("assets/fonts/slant_regular.ttf")){
-        //give some error message
+MainMenu::MainMenu(std::shared_ptr<Param> param) : mParam(param) {
+    if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
+        std::cerr << "mFont not loaded!!!";
+        std::exit(EXIT_FAILURE);
     }
 
-    mainMenu[0].setFont(font);
-    mainMenu[0].setFillColor(sf::Color(255, 204, 153));
-    mainMenu[0].setString("Play");
-    mainMenu[0].setCharacterSize(50);
-    mainMenu[0].setPosition(sf::Vector2f(50, 50));
+    sf::String menuOptions[MENU_ELEMENTS]{"Play", "Shop", "Achievements", "Quit"};
+    float position = 100;
 
-    mainMenu[1].setFont(font);
-    mainMenu[1].setFillColor(sf::Color(255, 204, 153));
-    mainMenu[1].setString("Store");
-    mainMenu[1].setCharacterSize(50);
-    mainMenu[1].setPosition(sf::Vector2f(50, 100));
+    //menu buttons
+    for (int i = 0; i < MENU_ELEMENTS; ++i) {
+        mMainMenu[i] = sf::Text(menuOptions[i], mFont, mFontSize);
+        mMainMenu[i].setFillColor(mFillColor);
+        mMainMenu[i].setPosition(position, position * (float) (i + 1));
+    }
 
-    mainMenu[2].setFont(font);
-    mainMenu[2].setFillColor(sf::Color(255, 204, 153));
-    mainMenu[2].setString("Achievements");
-    mainMenu[2].setCharacterSize(50);
-    mainMenu[2].setPosition(sf::Vector2f(50, 150));
+    mMainMenuSelect = 0;
+    mMainMenu[mMainMenuSelect].setFillColor(sf::Color::White);
 
-    mainMenu[3].setFont(font);
-    mainMenu[3].setFillColor(sf::Color(255, 204, 153));
-    mainMenu[3].setString("Quit");
-    mainMenu[3].setCharacterSize(50);
-    mainMenu[3].setPosition(sf::Vector2f(50, 200));
-
-    mainMenuSelect = 0;
-    mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
-
-    MenuRun();
+    mBackground.loadFromFile("assets/texture/TitleScreen.png");
+    mBgImage.setTexture(mBackground);
 }
 
-void MainMenu::moveUp(){
-
-    if(mainMenuSelect == 0){
-        mainMenu[mainMenuSelect].setFillColor(sf::Color(255, 204, 153));
-
-        //Change this if there are more menu options.
-        mainMenuSelect = 3;
-
-        mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
-    }
-    else{
-    mainMenu[mainMenuSelect].setFillColor(sf::Color(255, 204, 153));
-    mainMenuSelect--;
-    mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
-    }
+void MainMenu::update(const sf::Time &deltaTime) {
+    mMainMenu[mMainMenuSelect].setCharacterSize(80);
+    mMainMenu[mMainMenuSelect].setFillColor(sf::Color::White);
 }
 
-void MainMenu::moveDown(){
-
-    if(mainMenuSelect == 3){
-        mainMenu[mainMenuSelect].setFillColor(sf::Color(255, 204, 153));
-
-        //Change this if there are more menu options.
-        mainMenuSelect = 0;
-
-        mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
-    }
-    else{
-        mainMenu[mainMenuSelect].setFillColor(sf::Color(255, 204, 153));
-        mainMenuSelect++;
-        mainMenu[mainMenuSelect].setFillColor(sf::Color::White);
-    }
+void MainMenu::draw() {
+    mParam->window->clear();
+    mParam->window->draw(mBgImage);
+    print(mParam->window);
+    mParam->window->display();
 }
 
-void MainMenu::Draw(sf::RenderWindow &window) {
-    for(const auto & i : mainMenu){
-        window.draw(i);
-    }
-}
-
-void MainMenu::MenuRun() {
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Snake");
-    sf::Texture background;
-    background.loadFromFile("assets/texture/TitleScreen.png");
-    sf::Sprite bg_image(background);
-
-    while (window.isOpen()) {
-        sf::Event event{};
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
+void MainMenu::input() {
+    sf::Event event{};
+    while (mParam->window->pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            mParam->window->close();
+        }
+        if (event.type == sf::Event::KeyReleased) {
+            if (event.key.code == sf::Keyboard::Down) {
+                moveDown();
             }
-            if (event.type == sf::Event::KeyReleased) {
-                if (event.key.code == sf::Keyboard::Down) {
-                    moveDown();
+            if (event.key.code == sf::Keyboard::Up) {
+                moveUp();
+            }
+            if (event.key.code == sf::Keyboard::Return) {
+                switch (mMainMenuSelect) {
+                    case 0:
+                        mParam->states->add(std::make_unique<Engine>(mParam));
+                        break;
+                    case 1:
+                        mParam->states->add(std::make_unique<Shop>(mParam));
+                        break;
+                    case 2:
+                        mParam->states->add(std::make_unique<Achievements>(mParam));
+                        break;
+                    case 3:
+                        mParam->window->close();
+                        break;
                 }
-                if (event.key.code == sf::Keyboard::Up) {
-                    moveUp();
-                }
-                if (event.key.code == sf::Keyboard::Return) {
-                    switch (mainMenuSelect) {
-                        case 0:
-                            window.close();
-                            RunSnake();
-                            break;
-                        case 1:
-                            window.close();
-                            RunShop();
-                            break;
-                        case 2:
-                            window.close();
-                            RunAchievements();
-                            break;
-                        case 3:
-                            window.close();
-                            break;
-                    }
-                }
-
             }
         }
-        window.clear();
-        window.draw(bg_image);
-        Draw(window);
-        window.display();
-
-
-
     }
 }
-void MainMenu::RunSnake(){
-    Engine engine;
-    engine.run();
+
+void MainMenu::moveUp() {
+    if (mMainMenuSelect == 0) {
+        mMainMenu[mMainMenuSelect].setFillColor(mFillColor);
+        mMainMenu[mMainMenuSelect].setCharacterSize(mFontSize);
+        mMainMenuSelect = MENU_ELEMENTS - 1;
+    } else {
+        mMainMenu[mMainMenuSelect].setFillColor(mFillColor);
+        mMainMenu[mMainMenuSelect].setCharacterSize(mFontSize);
+        mMainMenuSelect--;
+    }
 }
-void MainMenu::RunShop(){
-    Shop shop;
-    shop.ShopRun();
+
+void MainMenu::moveDown() {
+    if (mMainMenuSelect == MENU_ELEMENTS - 1) {
+        mMainMenu[mMainMenuSelect].setFillColor(mFillColor);
+        mMainMenu[mMainMenuSelect].setCharacterSize(mFontSize);
+        mMainMenuSelect = 0;
+    } else {
+        mMainMenu[mMainMenuSelect].setFillColor(mFillColor);
+        mMainMenu[mMainMenuSelect].setCharacterSize(mFontSize);
+        mMainMenuSelect++;
+    }
 }
-void MainMenu::RunAchievements(){
-    Achievements achievements;
-    achievements.AchievementsRun();
+
+void MainMenu::print(std::unique_ptr<sf::RenderWindow> &window) {
+    for (const auto &i: mMainMenu) {
+        window->draw(i);
+    }
 }
-//engine.run();

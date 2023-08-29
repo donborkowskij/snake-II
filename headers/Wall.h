@@ -1,23 +1,13 @@
-//
-// Created by donat on 5/31/2021.
-//
-
-#ifndef FIRSTPROG_WALL_H
-#define FIRSTPROG_WALL_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 
-using namespace sf;
-
 class Wall {
-private:
-    RectangleShape wallShape;
-
 public:
-    Wall(Vector2f position, Vector2f size);
+    Wall(sf::Vector2f position, sf::Vector2f size);
 
-    RectangleShape getShape();
+    sf::RectangleShape getShape();
+
+private:
+    sf::RectangleShape wallShape;
 };
-
-
-#endif //FIRSTPROG_WALL_H

@@ -1,355 +1,217 @@
-//
-// Created by marki on 2021-06-04.
-//
 #include "Shop.h"
 #include "MainMenu.h"
-#include "iostream"
-int Shop_currency;
+#include <iostream>
 
-void Shop::Menu() {
-    if(!font.loadFromFile("assets/fonts/slant_regular.ttf")){
-        //give some error message
+Shop::Shop(std::shared_ptr<Param> param) : mParam(param) {
+    if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
+        std::cerr << "mFont not loaded!!!";
+        std::exit(EXIT_FAILURE);
     }
 
-    MainText[0].setFont(font);
-    MainText[0].setFillColor(sf::Color(255, 204, 153));
-    MainText[0].setString("Green Snake");
-    MainText[0].setCharacterSize(35);
-    MainText[0].setPosition(sf::Vector2f(75, 110));
+    loadCurrency();
+    loadBought();
 
-    TextChild[0].setFont(font);
-    TextChild[0].setFillColor(sf::Color(255, 204, 153));
-    TextChild[0].setString("Cost: 25 apples");
-    TextChild[0].setCharacterSize(20);
-    TextChild[0].setPosition(sf::Vector2f(75, 150));
+    sf::Color altTextColor[]{
+            sf::Color::Green,
+            sf::Color::Red,
+            sf::Color::Blue,
+            sf::Color::Yellow
+    };
 
-    MainText[1].setFont(font);
-    MainText[1].setFillColor(sf::Color(255, 204, 153));
-    MainText[1].setString("Red Snake");
-    MainText[1].setCharacterSize(35);
-    MainText[1].setPosition(sf::Vector2f(75, 230));
+    sf::String mainTextOptions[4]{"Green Snake", "Red Snake", "Blue Snake", "Yellow Snake"};
+    sf::String textChildCost = "Cost: 25 apples";
+    sf::String altTextOption = "Equipped";
 
-    TextChild[1].setFont(font);
-    TextChild[1].setFillColor(sf::Color(255, 204, 153));
-    TextChild[1].setString("Cost: 25 apples");
-    TextChild[1].setCharacterSize(20);
-    TextChild[1].setPosition(sf::Vector2f(75, 270));
+    for (int i = 0; i < SHOP_ELEMENTS; ++i) {
+        mMainText[i] = sf::Text(mainTextOptions[i], mFont, mMainTextFontSize);
+        mMainText[i].setFillColor(mFillColor);
+        mMainText[i].setPosition(75, 110 + (120 * i));
 
-    MainText[2].setFont(font);
-    MainText[2].setFillColor(sf::Color(255, 204, 153));
-    MainText[2].setString("Blue Snake");
-    MainText[2].setCharacterSize(35);
-    MainText[2].setPosition(sf::Vector2f(75, 350));
+        mTextChild[i] = sf::Text(textChildCost, mFont, mTextChildFontSize);
+        mTextChild[i].setFillColor(mFillColor);
+        mTextChild[i].setPosition(75, 110 + (120 * i) + 40);
 
-    TextChild[2].setFont(font);
-    TextChild[2].setFillColor(sf::Color(255, 204, 153));
-    TextChild[2].setString("Cost: 25 apples");
-    TextChild[2].setCharacterSize(20);
-    TextChild[2].setPosition(sf::Vector2f(75, 390));
+        mAltText[i] = sf::Text(altTextOption, mFont, mTextChildFontSize);
+        mAltText[i].setFillColor(altTextColor[i]);
+        mAltText[i].setPosition(75, 150 + (120 * i));
+    }
 
-    MainText[3].setFont(font);
-    MainText[3].setFillColor(sf::Color(255, 204, 153));
-    MainText[3].setString("Yellow Snake");
-    MainText[3].setCharacterSize(35);
-    MainText[3].setPosition(sf::Vector2f(75, 470));
+    mExtraText[0].setFont(mFont);
+    mExtraText[0].setFillColor(mFillColor);
+    mExtraText[0].setString("Press Q to quit to Main menu");
+    mExtraText[0].setCharacterSize(30);
+    mExtraText[0].setPosition(sf::Vector2f(420, 560));
 
-    TextChild[3].setFont(font);
-    TextChild[3].setFillColor(sf::Color(255, 204, 153));
-    TextChild[3].setString("Cost: 50 apples");
-    TextChild[3].setCharacterSize(20);
-    TextChild[3].setPosition(sf::Vector2f(75, 510));
+    mExtraText[1].setFont(mFont);
+    mExtraText[1].setFillColor(mFillColor);
+    mExtraText[1].setString("Apples: " + std::to_string(mShopCurrency));
+    mExtraText[1].setCharacterSize(40);
+    mExtraText[1].setPosition(sf::Vector2f(75, 25));
 
-    ExtraText[0].setFont(font);
-    ExtraText[0].setFillColor(sf::Color(255, 204, 153));
-    ExtraText[0].setString("Press Q to quit to Main menu");
-    ExtraText[0].setCharacterSize(30);
-    ExtraText[0].setPosition(sf::Vector2f(420, 560));
+    mShopSelect = 0;
+    mMainText[mShopSelect].setFillColor(sf::Color::White);
 
-    ExtraText[1].setFont(font);
-    ExtraText[1].setFillColor(sf::Color(255, 204, 153));
-    //ExtraText[1].setString("Apples: " + to_string(::Shop_currency));
-    ExtraText[1].setCharacterSize(40);
-    ExtraText[1].setPosition(sf::Vector2f(75, 25));
-
-    AltText[0].setFont(font);
-    AltText[0].setFillColor(sf::Color::Green);
-    AltText[0].setString("Equip");
-    AltText[0].setCharacterSize(20);
-    AltText[0].setPosition(sf::Vector2f(75, 150));
-
-    AltText[1].setFont(font);
-    AltText[1].setFillColor(sf::Color::Red);
-    AltText[1].setString("Equip");
-    AltText[1].setCharacterSize(20);
-    AltText[1].setPosition(sf::Vector2f(75, 270));
-
-    AltText[2].setFont(font);
-    AltText[2].setFillColor(sf::Color::Blue);
-    AltText[2].setString("Equip");
-    AltText[2].setCharacterSize(20);
-    AltText[2].setPosition(sf::Vector2f(75, 390));
-
-    AltText[3].setFont(font);
-    AltText[3].setFillColor(sf::Color::Yellow);
-    AltText[3].setString("Equip");
-    AltText[3].setCharacterSize(20);
-    AltText[3].setPosition(sf::Vector2f(75, 510));
-
-    ShopSelect = 0;
-    MainText[ShopSelect].setFillColor(sf::Color::White);
-
+    mBackground.loadFromFile("assets/texture/ShopMenu.png");
+    mBgImage.setTexture(mBackground);
 }
 
-void Shop::moveUp(){
-    if(ShopSelect == 0){
-        MainText[ShopSelect].setFillColor(sf::Color(255, 204, 153));
-
-        //Change this if there are more menu options.
-        ShopSelect = 3;
-
-        MainText[ShopSelect].setFillColor(sf::Color::White);
-    }
-    else{
-        MainText[ShopSelect].setFillColor(sf::Color(255, 204, 153));
-        ShopSelect--;
-        MainText[ShopSelect].setFillColor(sf::Color::White);
-    }
+void Shop::update(const sf::Time &deltaTime) {
+    mMainText[mShopSelect].setCharacterSize(40);
+    mMainText[mShopSelect].setFillColor(sf::Color::White);
 }
 
-void Shop::moveDown(){
-    if(ShopSelect == 3){
-        MainText[ShopSelect].setFillColor(sf::Color(255, 204, 153));
-
-        //Change this if there are more menu options.
-        ShopSelect = 0;
-
-        MainText[ShopSelect].setFillColor(sf::Color::White);
-    }
-    else{
-        MainText[ShopSelect].setFillColor(sf::Color(255, 204, 153));
-        ShopSelect++;
-        MainText[ShopSelect].setFillColor(sf::Color::White);
-    }
+void Shop::draw() {
+    mParam->window->clear();
+    sf::Color(255, 204, 153);
+    mParam->window->draw(mBgImage);
+    drawExtra(mParam->window);
+    print(mParam->window);
+    mParam->window->display();
 }
 
-void Shop::Draw(sf::RenderWindow &window) {
-    int number;
-    for(int c=0; c <=3; c++){
-        window.draw(MainText[c]);
-        number = ReturnBought (c);
-        if(number == 0){
-            window.draw(TextChild[c]);
+void Shop::input() {
+    sf::Event event;
+    while (mParam->window->pollEvent(event)) {
+        switch (event.type) {
+            case sf::Event::Closed:
+                mParam->window->close();
+                break;
+
+            case sf::Event::KeyReleased:
+                handleKeyInput(event.key.code);
+                break;
+
+            default:
+                break;
         }
-        else{
-            window.draw(AltText[c]);
+    }
+}
+
+void Shop::handleKeyInput(sf::Keyboard::Key keyCode) {
+    if (keyCode == sf::Keyboard::Down) {
+        moveDown();
+    } else if (keyCode == sf::Keyboard::Up) {
+        moveUp();
+    } else if (keyCode == sf::Keyboard::Q) {
+        returnToMainMenu();
+    } else if (keyCode == sf::Keyboard::Enter) {
+        handleShopSelection();
+    }
+}
+
+void Shop::returnToMainMenu() {
+    mParam->states->add(std::make_unique<MainMenu>(mParam), true);
+}
+
+void Shop::handleShopSelection() {
+    switch (mShopSelect) {
+        case 0:
+            buySnakeColor(0, 25);
+            break;
+        case 1:
+            buySnakeColor(1, 25);
+            break;
+        case 2:
+            buySnakeColor(2, 25);
+            break;
+        case 3:
+            buySnakeColor(3, 50);
+            break;
+    }
+}
+
+void Shop::moveUp() {
+    if (mShopSelect == 0) {
+        mMainText[mShopSelect].setFillColor(mFillColor);
+        mMainText[mShopSelect].setCharacterSize(mMainTextFontSize);
+        mShopSelect = SHOP_ELEMENTS - 1;
+    } else {
+        mMainText[mShopSelect].setFillColor(mFillColor);
+        mMainText[mShopSelect].setCharacterSize(mMainTextFontSize);
+        mShopSelect--;
+    }
+}
+
+void Shop::moveDown() {
+    if (mShopSelect == SHOP_ELEMENTS - 1) {
+        mMainText[mShopSelect].setFillColor(mFillColor);
+        mMainText[mShopSelect].setCharacterSize(mMainTextFontSize);
+        mShopSelect = 0;
+    } else {
+        mMainText[mShopSelect].setFillColor(mFillColor);
+        mMainText[mShopSelect].setCharacterSize(mMainTextFontSize);
+        mShopSelect++;
+    }
+}
+
+void Shop::print(std::unique_ptr<sf::RenderWindow> &window) {
+    for (int i = 0; i < SHOP_ELEMENTS; i++) {
+        window->draw(mMainText[i]);
+        if (i != mEquipped) {
+            window->draw(mTextChild[i]);
+        } else {
+            window->draw(mAltText[i]);
         }
-
     }
-
-    /*
-    for(const auto & i : MainText){
-        window.draw(i);
-    }
-     */
-}
-void Shop::DrawExtra(sf::RenderWindow &window) {
-    ExtraText[1].setString("Apples: " + to_string(::Shop_currency));
-    window.draw(ExtraText[0]);
-    window.draw(ExtraText[1]);
 }
 
-void Shop::SaveData() {
-    //load previous data
-    ifstream saveFileProfile ("assets/save/dataProfile.txt");
+void Shop::drawExtra(std::unique_ptr<sf::RenderWindow> &window) {
+    mExtraText[1].setString("Apples: " + std::to_string(mShopCurrency));
+    window->draw(mExtraText[0]);
+    window->draw(mExtraText[1]);
+}
+
+void Shop::saveData() {
+    std::ifstream saveFileProfile("assets/save/dataProfile.txt");
     int apples;
     int score;
-    if (saveFileProfile.is_open()){
-        saveFileProfile>>apples>>score;
+    if (saveFileProfile.is_open()) {
+        saveFileProfile >> apples >> score;
         saveFileProfile.close();
     }
 
-    //store new + old data
-    ofstream saveProfile ("assets/save/dataProfile.txt", ofstream::trunc);
-    if (saveProfile.is_open()){
-        saveProfile<<::Shop_currency<<endl<<score;
+    std::ofstream saveProfile("assets/save/dataProfile.txt", std::ofstream::trunc);
+    if (saveProfile.is_open()) {
+        saveProfile << mShopCurrency << std::endl << score;
         saveFileProfile.close();
     }
-
-
 }
 
-void Shop::LoadData() {
-    ifstream saveFileProfile ("assets/save/dataProfile.txt");
-    if (saveFileProfile.is_open()){
-        int a;
-        saveFileProfile>>a;
-        saveFileProfile.close();
-        ::Shop_currency = a;
+void Shop::loadCurrency() {
+    std::ifstream saveFileProfile("assets/save/dataProfile.txt");
+    if (saveFileProfile.is_open()) {
+        if (saveFileProfile >> mShopCurrency) {
+            saveFileProfile.close();
+        } else {
+            std::cerr << "Error reading integer from the file." << std::endl;
+        }
+    } else {
+        std::cerr << "Could not open file for reading." << std::endl;
     }
 }
 
-int Shop::ReturnBought(int number) {
-    //load previous data
-    int GreenSnake,RedSnake,BlueSnake,YellowSnake;
-    ifstream saveFileProfile ("assets/save/Bought.txt");
-    if (saveFileProfile.is_open()){
-        saveFileProfile>>GreenSnake>>RedSnake>>BlueSnake>>YellowSnake;
-        saveFileProfile.close();
-    }
-    if(number == 0){
-        return GreenSnake;
-    }
-    if(number == 1){
-        return RedSnake;
-    }
-    if(number == 2){
-        return BlueSnake;
-    }
-    if(number == 3){
-        return YellowSnake;
+void Shop::loadBought() {
+    std::ifstream saveFileProfile("assets/save/Bought.txt");
+    if (saveFileProfile.is_open()) {
+        saveFileProfile >> mEquipped;
     }
 }
-void Shop::SaveBought(int a, int b, int c, int d) {
-    int GreenSnake = 0;
-    int RedSnake = 0;
-    int BlueSnake = 0;
-    int YellowSnake  = 0;
 
-    //load previous data
-    ifstream saveFileProfile ("assets/save/Bought.txt");
-    if (saveFileProfile.is_open()){
-        saveFileProfile>>GreenSnake>>RedSnake>>BlueSnake>>YellowSnake;
+void Shop::saveBought() {
+    std::ofstream saveFileProfile("assets/save/Bought.txt", std::ofstream::trunc);
+    if (saveFileProfile.is_open()) {
+        saveFileProfile << mEquipped << std::endl;
         saveFileProfile.close();
     }
+}
 
-    //store new + old data
-    ofstream saveProfile ("assets/save/Bought.txt", ofstream::trunc);
-    if (saveProfile.is_open()){
-        if(GreenSnake>=a){
-            saveProfile<<GreenSnake<<endl;
-        }
-        else{
-            saveProfile<<a<<endl;
-        }
-        if(RedSnake>=b){
-            saveProfile<<RedSnake<<endl;
-        }
-        else{
-            saveProfile<<b<<endl;
-        }
-        if(a!=BlueSnake){
-            saveProfile<<BlueSnake<<endl;
-        }
-        else{
-            saveProfile<<c<<endl;
-        }
-        if(a!=YellowSnake){
-            saveProfile<<YellowSnake<<endl;
-        }
-        else{
-            saveProfile<<d<<endl;
-        }
-        saveProfile.close();
+void Shop::buySnakeColor(int colorIndex, int price) {
+    int array[SHOP_ELEMENTS] = {};
+    array[colorIndex] = 1;
+    if (mShopCurrency >= price) {
+        mShopCurrency -= price;
+        mEquipped = colorIndex;
+        saveBought();
+        saveData();
     }
-}
-
-void Shop::ShopRun() {
-    Menu();
-    LoadData();
-    sf::RenderWindow window(sf::VideoMode(800, 600), "Snake");
-    sf::Texture background;
-    background.loadFromFile("assets/texture/ShopMenu.png");
-    sf::Sprite bg_image(background);
-
-    while (window.isOpen()) {
-        sf::Event event{};
-        while (window.pollEvent(event)) {
-            if (event.type == sf::Event::Closed) {
-                window.close();
-            }
-            if (event.type == sf::Event::KeyReleased) {
-                if (event.key.code == sf::Keyboard::Down) {
-                    moveDown();
-                }
-                if (event.key.code == sf::Keyboard::Up) {
-                    moveUp();
-                }
-                if (event.key.code == Keyboard::Q){
-                    window.close();
-                    runMenu();
-                }
-                if (event.key.code == sf::Keyboard::Return) {
-                    switch (ShopSelect) {
-                        case 0:
-                            if(ReturnBought(0) == 1){
-                                SnakeColorBuy(0);
-                            }
-                            else if(::Shop_currency>=25){
-                                ::Shop_currency-=25;
-                                //cout << ::Shop_currency;
-                                SnakeColorBuy(0);
-                                SaveBought(1,0,0,0);
-                                SaveData();
-                            }
-                            break;
-                        case 1:
-                            if(ReturnBought(1) == 1){
-                                SnakeColorBuy(1);
-                            }
-                            else if(::Shop_currency>=25){
-                                ::Shop_currency-=25;
-                                SnakeColorBuy(1);
-                                SaveBought(0,1,0,0);
-                                SaveData();
-
-
-                            }
-                            break;
-                        case 2:
-                            if(ReturnBought(2) == 1){
-                                SnakeColorBuy(2);
-                            }
-                            else if(::Shop_currency>=25){
-                                ::Shop_currency-=25;
-                                SnakeColorBuy(2);
-                                SaveBought(0,0,1,0);
-                                SaveData();
-
-
-                            }
-                            break;
-                        case 3:
-                            if(ReturnBought(3) == 1){
-                                SnakeColorBuy(3);
-                            }
-                            else if(::Shop_currency>=50){
-                                ::Shop_currency-=50;
-                                SnakeColorBuy(3);
-                                SaveBought(0,0,0,1);
-                                SaveData();
-
-                            }
-                            break;
-
-                    }
-                }
-
-            }
-        }
-
-        window.clear();
-        window.draw(bg_image);
-        DrawExtra(window);
-        Draw(window);
-        window.display();
-
-    }
-}
-void Shop::runMenu(){
-    MainMenu menu;
-    menu.Menu();
-}
-void Shop::SnakeColorBuy(int a){
-    Snake::SnakeColor(a);
-
 }

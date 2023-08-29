@@ -1,9 +1,4 @@
-//
-// Created by donat on 5/30/2021.
-//
-
-#ifndef FIRSTPROG_ENGINE_H
-#define FIRSTPROG_ENGINE_H
+#pragma once
 
 #include "Snake.h"
 #include "Apple.h"
@@ -15,79 +10,98 @@
 #include <fstream>
 #include "MainMenu.h"
 #include "Achievements.h"
+#include "State.h"
 
-using namespace sf;
-using namespace std;
-
-class Engine {
-private:
-
-    Vector2f resolution;
-    RenderWindow window;
-    const unsigned int FPS = 60;
-    static const Time TimePerFrame;
-
-    vector<Snake> snake;
-
-    int snakeDirection;
-    deque<int> directionQueue; //queue for direction key presses
-    int speed;
-    int sectionsToAdd;
-    int applesEatenThisLevel;
-    int applesEatenTotal;
-    unsigned long long int score;
-
-    Apple apple;
-
-    vector<Wall> wallSections;
-    int currentLevel;
-    int maxLevels;
-    vector<String> levels;
-
-    Font mainFont;
-    Text titleText;
-    Text applesEatenText;
-    Text currentLevelText;
-    Text scoreText;
-    Text gameOverText;
-    Text pressSpaceText;
-    Text quitToMenuText;
-
-
-    Time timeSinceLastMove;
-
-    int currentGameState;
-    int lastGameState; // for storing the last state the game was in
-
+class Engine : public State {
 public:
-    enum Direction{ UP, RIGHT, DOWN, LEFT};
-    enum GameState {RUNNING, PAUSED, GAMEOVER};
-    Engine();
-    void input();
-    void addDirection(int newDirection);
-    void update();
-    void draw();
+    Engine(std::shared_ptr<Param> param);
 
-    static void setupText(Text *textItem, const Font &font, const String &value, int size, Color colour);
+    void update(const sf::Time &deltaTime) override;
+
+    void draw() override;
+
+    void input() override;
+
+private:
+    static void setupText(sf::Text *textItem,
+                          const sf::Font &font,
+                          const sf::String &value,
+                          int size,
+                          sf::Color colour);
+
+    void addDirection(int newDirection);
 
     void newSnake();
+
     void addSnake();
 
     void moveApple();
+
     void checkLevelFiles();
+
     void loadLevel(int levelNumber);
 
     void beginNextLevel();
+
     void startTheGame();
 
     void togglePause();
 
-    void saveData();
+    void saveData() const;
 
-    void run();
-    void runMenu();
+    void handleDirectionChange();
 
+    void updateScore();
+
+    void updateSnake(sf::Vector2f thisSectionPosition,
+                     sf::Vector2f lastSectionPosition);
+
+    void collisionWithApple();
+
+    void collisionGameOver();
+
+    bool checkCollision(sf::RectangleShape shape1, sf::RectangleShape shape2);
+
+    void toggleGameOver();
+
+    enum Direction {
+        UP, RIGHT, DOWN, LEFT
+    };
+    enum GameState {
+        RUNNING, PAUSED, GAMEOVER
+    };
+
+    std::shared_ptr<Param> mParam;
+    sf::Vector2f mResolution;
+    const unsigned int FPS = 60;
+    static const sf::Time mTimePerFrame;
+    sf::Time mTimeSinceLastMove;
+
+    std::vector<Snake> mSnake;
+    int mSnakeDirection;
+    std::deque<int> mDirectionQueue;
+    int mSpeed;
+    int mSectionsToAdd;
+    int mApplesEatenThisLevel;
+    int mApplesEatenTotal;
+    unsigned long long int mScore;
+
+    Apple mApple;
+    std::vector<Wall> mWallSections;
+
+    int mCurrentLevel;
+    int mMaxLevels;
+    std::vector<sf::String> levels;
+
+    sf::Font mFont;
+    sf::Text mTitleText;
+    sf::Text mApplesEatenText;
+    sf::Text mCurrentLevelText;
+    sf::Text mScoreText;
+    sf::Text mGameOverText;
+    sf::Text mPressSpaceText;
+    sf::Text mQuitToMenuText;
+
+    int mCurrentGameState;
+    int mLastGameState;
 };
-
-
-#endif //FIRSTPROG_ENGINE_H

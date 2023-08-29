@@ -1,25 +1,15 @@
-//
-// Created by donat on 5/30/2021.
-//
-
-#ifndef FIRSTPROG_APPLE_H
-#define FIRSTPROG_APPLE_H
+#pragma once
 
 #include <SFML/Graphics.hpp>
 
-using namespace sf;
-
 class Apple {
-private:
-    RectangleShape sprite;
-
 public:
     Apple();
 
-    void setPosition(Vector2f newPosition);
-    RectangleShape getSprite();
+    void setPosition(sf::Vector2f newPosition);
 
+    sf::RectangleShape getSprite();
+
+private:
+    sf::RectangleShape mSprite;
 };
-
-
-#endif //FIRSTPROG_APPLE_H

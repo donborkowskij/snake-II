@@ -1,267 +1,456 @@
-//
-// Created by donat on 5/30/2021.
-//
-
 #include "Engine.h"
-#include "iostream"
+#include <iostream>
 
-const sf::Time Engine::TimePerFrame = seconds(1.f/60.f);
+Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
+    if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
+        std::cerr << "mFont not loaded!!!";
+        std::exit(EXIT_FAILURE);
+    }
 
-Engine::Engine(){
-    resolution = Vector2f(800,600);
-    window.create(VideoMode(resolution.x, resolution.y), "Snake", Style::Default);
-    window.setFramerateLimit(FPS);
-    maxLevels = 0;
+    mResolution = sf::Vector2f(800, 600);
+    mParam->window->setFramerateLimit(FPS);
+    mMaxLevels = 0;
     checkLevelFiles();
 
+    sf::FloatRect textBounds;
+
+    // Title Text
+    setupText(&mTitleText, mFont, "Snake II", 28, sf::Color::Blue);
+    textBounds = mTitleText.getLocalBounds();
+    mTitleText.setPosition(sf::Vector2f(mResolution.x / 2 - textBounds.width / 2, -9));
+
+    // Current Level Text
+    setupText(&mCurrentLevelText, mFont, "level 1", 28, sf::Color::Blue);
+    mCurrentLevelText.setPosition(sf::Vector2f(15, -9));
+    textBounds = mCurrentLevelText.getGlobalBounds();
+
+    // Apples Eaten Text
+    setupText(&mApplesEatenText, mFont, "apples 0", 28, sf::Color::Blue);
+    mApplesEatenText.setPosition(sf::Vector2f(textBounds.left + textBounds.width + 20, -9));
+
+    // Score Text
+    setupText(&mScoreText, mFont, std::to_string(mScore), 28, sf::Color::Blue);
+    textBounds = mScoreText.getLocalBounds();
+    mScoreText.setPosition(mResolution.x - textBounds.width - 15, -9);
+
+    // Game Over Text
+    setupText(&mGameOverText, mFont, "GAME OVER", 72, sf::Color::Yellow);
+    textBounds = mGameOverText.getLocalBounds();
+    mGameOverText.setPosition(sf::Vector2f(mResolution.x / 2 - textBounds.width / 2, 100));
+    mGameOverText.setOutlineColor(sf::Color::Black);
+    mGameOverText.setOutlineThickness(2);
+
+    // Quit to Menu Text
+    setupText(&mQuitToMenuText, mFont, "Press Q to quit to Main menu", 30, sf::Color::Yellow);
+    textBounds = mQuitToMenuText.getLocalBounds();
+    mQuitToMenuText.setPosition(sf::Vector2f(mResolution.x / 2 - textBounds.width / 2, 500));
+    mQuitToMenuText.setOutlineColor(sf::Color::Black);
+    mQuitToMenuText.setOutlineThickness(1);
+
+    // Press Space Text
+    setupText(&mPressSpaceText, mFont, "Press SPACE to try again", 38, sf::Color::Green);
+    textBounds = mPressSpaceText.getLocalBounds();
+    mPressSpaceText.setPosition(sf::Vector2f(mResolution.x / 2 - textBounds.width / 2, 200));
+    mPressSpaceText.setOutlineColor(sf::Color::Black);
+    mPressSpaceText.setOutlineThickness(2);
+
     startTheGame();
-
-    mainFont.loadFromFile("assets/fonts/slant_regular.ttf");
-    setupText(&titleText, mainFont, "Snake", 28, Color::Blue);
-    FloatRect titleTextBounds = titleText.getLocalBounds();
-    titleText.setPosition(Vector2f( resolution.x / 2 - titleTextBounds.width / 2, -9));
-
-    setupText(&currentLevelText, mainFont, "level 1", 28, Color::Blue);
-    currentLevelText.setPosition(Vector2f(15, -9));
-    FloatRect currentLevelTextBounds = currentLevelText.getGlobalBounds();
-
-    setupText(&applesEatenText, mainFont, "apples 0", 28, Color::Blue);
-    applesEatenText.setPosition(Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width +20, -9));
-
-    setupText(&scoreText, mainFont, to_string(score), 28, Color::Blue);
-    FloatRect scoreTextBounds = scoreText.getLocalBounds();
-    scoreText.setPosition(resolution.x - scoreTextBounds.width -15, -9);
-
-    setupText(&gameOverText, mainFont, "GAME OVER", 72, Color::Yellow);
-    FloatRect  gameOverTextBounds= gameOverText.getLocalBounds();
-    gameOverText.setPosition(Vector2f(resolution.x / 2 - gameOverTextBounds.width / 2, 100));
-    gameOverText.setOutlineColor(Color::Black);
-    gameOverText.setOutlineThickness(2);
-
-    setupText(&quitToMenuText, mainFont, "Press Q to quit to Main menu", 30, Color::Yellow);
-    FloatRect  quitToMenuBounds= quitToMenuText.getLocalBounds();
-    quitToMenuText.setPosition(Vector2f(resolution.x / 2 - quitToMenuBounds.width / 2, 500));
-    quitToMenuText.setOutlineColor(Color::Black);
-    quitToMenuText.setOutlineThickness(1);
-
-    setupText(&pressSpaceText, mainFont, "Press SPACE to try again", 38, Color::Green);
-    FloatRect pressSpaceTextBounds = pressSpaceText.getLocalBounds();
-    pressSpaceText.setPosition(Vector2f(resolution.x / 2 - pressSpaceTextBounds.width / 2 , 200));
-    pressSpaceText.setOutlineColor(Color::Black);
-    pressSpaceText.setOutlineThickness(2);
-
 }
 
-void Engine::startTheGame(){
-    score = 0;
-    speed = 2;
-    snakeDirection= Direction::RIGHT;
-    timeSinceLastMove = Time::Zero;
+void Engine::update(const sf::Time &deltaTime) {
+    if (mCurrentGameState != GameState::PAUSED) {
+        if (mCurrentGameState != GameState::GAMEOVER) {
+            mTimeSinceLastMove += deltaTime;
 
-    sectionsToAdd = 0;
-    directionQueue.clear();
-    wallSections.clear();
-    applesEatenThisLevel = 0;
-    applesEatenTotal = 0;
-    currentLevel = 1;
-    loadLevel(currentLevel);
+            if (mTimeSinceLastMove.asSeconds() >= sf::seconds(1.f / float(mSpeed)).asSeconds()) {
+                sf::Vector2f thisSectionPosition = mSnake[0].getPosition();
+                sf::Vector2f lastSectionPosition = thisSectionPosition;
+
+                handleDirectionChange();
+
+                updateScore();
+
+                updateSnake(thisSectionPosition, lastSectionPosition);
+
+                collisionWithApple();
+
+                collisionGameOver();
+
+                mTimeSinceLastMove = sf::Time::Zero;
+            }
+        }
+    }
+}
+
+void Engine::draw() {
+    mParam->window->clear(sf::Color::Black);
+
+    for (auto &w: mWallSections) {
+        mParam->window->draw(w.getShape());
+    }
+
+    mParam->window->draw(mApple.getSprite());
+
+    for (auto &s: mSnake) {
+        mParam->window->draw(s.getShape());
+    }
+
+    mParam->window->draw(mTitleText);
+    mParam->window->draw(mCurrentLevelText);
+    mParam->window->draw(mApplesEatenText);
+    mParam->window->draw(mScoreText);
+
+    if (mCurrentGameState == GameState::GAMEOVER) {
+        mParam->window->draw(mGameOverText);
+        mParam->window->draw(mPressSpaceText);
+        mParam->window->draw(mQuitToMenuText);
+    }
+
+    mParam->window->display();
+}
+
+void Engine::input() {
+    sf::Event event{};
+
+    while (mParam->window->pollEvent(event)) {
+        if (event.type == sf::Event::Closed) {
+            mParam->window->close();
+        }
+
+        if (event.type == sf::Event::KeyPressed) {
+            if (event.key.code == sf::Keyboard::Escape) {
+                mParam->window->close();
+            }
+
+            if (event.key.code == sf::Keyboard::Pause) {
+                togglePause();
+            }
+
+            if (mCurrentGameState == GameState::GAMEOVER) {
+                if (event.key.code == sf::Keyboard::Space) {
+                    saveData();
+                    startTheGame();
+                } else if (event.key.code == sf::Keyboard::Q) {
+                    saveData();
+                    mParam->states->add(std::make_unique<MainMenu>(mParam));
+                }
+            }
+
+            switch (event.key.code) {
+                case sf::Keyboard::Up:
+                    addDirection(Direction::UP);
+                    break;
+                case sf::Keyboard::Down:
+                    addDirection(Direction::DOWN);
+                    break;
+                case sf::Keyboard::Left:
+                    addDirection(Direction::LEFT);
+                    break;
+                case sf::Keyboard::Right:
+                    addDirection(Direction::RIGHT);
+                    break;
+                default:
+                    break;
+            }
+        }
+    }
+}
+
+void Engine::startTheGame() {
+    // Reset game parameters
+    mScore = 0;
+    mSpeed = 5;
+    mSnakeDirection = Direction::RIGHT;
+    mTimeSinceLastMove = sf::Time::Zero;
+
+    // Reset mSnake and level data
+    mSectionsToAdd = 0;
+    mDirectionQueue.clear();
+    mWallSections.clear();
+    mApplesEatenThisLevel = 0;
+    mApplesEatenTotal = 0;
+    mCurrentLevel = 1;
+    loadLevel(mCurrentLevel);
     newSnake();
     moveApple();
-    currentGameState = GameState::RUNNING;
-    lastGameState = currentGameState;
-    currentLevelText.setString("level " + to_string(currentLevel));
-    applesEatenText.setString("apples " + to_string(applesEatenTotal));
-    FloatRect currentLevelTextBounds = currentLevelText.getGlobalBounds();
-    applesEatenText.setPosition(Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width +20, -9));
-    scoreText.setString(to_string(score));
-    FloatRect scoreTextBounds = scoreText.getLocalBounds();
-    scoreText.setPosition(resolution.x - scoreTextBounds.width -15, -9);
+    mCurrentGameState = GameState::RUNNING;
+    mLastGameState = mCurrentGameState;
 
+    // Update UI elements
+    mCurrentLevelText.setString("level " + std::to_string(mCurrentLevel));
+    mApplesEatenText.setString("apples " + std::to_string(mApplesEatenTotal));
+
+    sf::FloatRect currentLevelTextBounds = mCurrentLevelText.getGlobalBounds();
+    sf::FloatRect scoreTextBounds = mScoreText.getLocalBounds();
+
+    // Update positions of UI elements
+    mApplesEatenText.setPosition
+            (sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
+    mScoreText.setString(std::to_string(mScore));
+    mScoreText.setPosition(mResolution.x - scoreTextBounds.width - 15, -9);
 }
 
-//load next level and reset the snake
+//load next level and reset the Snake
 void Engine::beginNextLevel() {
-    currentLevel +=1;
-    wallSections.clear();
-    directionQueue.clear();
-    speed = 2 +currentLevel;
-    snakeDirection = Direction::RIGHT;
-    sectionsToAdd = 0;
-    applesEatenThisLevel = 0;
+    mCurrentLevel += 1;
+    mWallSections.clear();
+    mDirectionQueue.clear();
+    mSpeed = 2 + mCurrentLevel;
+    mSnakeDirection = Direction::RIGHT;
+    mSectionsToAdd = 0;
+    mApplesEatenThisLevel = 0;
 
-    loadLevel(currentLevel);
+    loadLevel(mCurrentLevel);
     newSnake();
     moveApple();
-    currentLevelText.setString("level " + to_string(currentLevel));
-    FloatRect currentLevelTextBounds = currentLevelText.getGlobalBounds();
-    applesEatenText.setPosition(Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width +20, -9));
-
+    mCurrentLevelText.setString("level " + std::to_string(mCurrentLevel));
+    sf::FloatRect currentLevelTextBounds = mCurrentLevelText.getGlobalBounds();
+    mApplesEatenText.setPosition
+            (sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
 }
 
-//new snake at the beginning of a level;
+//new Snake at the beginning of a level;
 void Engine::newSnake() {
-    snake.clear();
-    snake.emplace_back(Vector2f(100,100));
-    snake.emplace_back(Vector2f(80,100));
-    snake.emplace_back(Vector2f(60,100));
-
+    mSnake.clear();
+    mSnake.emplace_back(sf::Vector2f(100, 100));
+    mSnake.emplace_back(sf::Vector2f(80, 100));
+    mSnake.emplace_back(sf::Vector2f(60, 100));
 }
+
 //The tail of the Snake, to elongate the body
 void Engine::addSnake() {
-    Vector2f newSectionPosition = snake[snake.size() - 1].getPosition();
-    snake.emplace_back(newSectionPosition);
+    sf::Vector2f newSectionPosition = mSnake[mSnake.size() - 1].getPosition();
+    mSnake.emplace_back(newSectionPosition);
 }
 
 void Engine::moveApple() {
-    //Find a location to place the apple(not inside snake/wall)
+    //Find a location to place the Apple(not inside Snake/Wall)
 
-    //Divide the field into sections the size of the apple - except the walls
-    Vector2f appleResolution = Vector2f(resolution.x / 20 - 2, resolution.y /20 -2);
-    Vector2f newAppleLocation;
+    //Divide the field into sections the size of the Apple - except the walls
+    sf::Vector2f appleResolution = sf::Vector2f(mResolution.x / 20 - 2, mResolution.y / 20 - 2);
+    sf::Vector2f newAppleLocation;
     bool badLocation = false;
     srand(time(nullptr));
     //loop to find good locations
     do {
         badLocation = false;
         //generate random location
-        newAppleLocation.x = (float)(1 + rand() / ((RAND_MAX + 1u) / (int)appleResolution.x)) *20;
-        newAppleLocation.y = (float)(1 + rand() / ((RAND_MAX + 1u) / (int)appleResolution.y)) *20;
+        newAppleLocation.x = (float) (1 + rand() / ((RAND_MAX + 1u) / (int) appleResolution.x)) * 20;
+        newAppleLocation.y = (float) (1 + rand() / ((RAND_MAX + 1u) / (int) appleResolution.y)) * 20;
 
-        //check if it's in the snake
-        for(auto & s : snake) {
-            if (s.getShape().getGlobalBounds().intersects(Rect<float>(newAppleLocation.x, newAppleLocation.y, 20 , 20))){
+        //check if it's in the Snake
+        for (auto &s: mSnake) {
+            if (s.getShape().getGlobalBounds().intersects(
+                    sf::Rect<float>(newAppleLocation.x, newAppleLocation.y, 20, 20))) {
                 badLocation = true;
                 break;
             }
         }
 
-        //check if its in the wall
-        for (auto & w : wallSections) {
-            if (w.getShape().getGlobalBounds().intersects(Rect<float>(newAppleLocation.x, newAppleLocation.y, 20 , 20))) {
+        //check if its in the Wall
+        for (auto &w: mWallSections) {
+            if (w.getShape().getGlobalBounds().intersects(
+                    sf::Rect<float>(newAppleLocation.x, newAppleLocation.y, 20, 20))) {
                 badLocation = true;
                 break;
             }
         }
 
     } while (badLocation);
-        apple.setPosition(newAppleLocation);
+    mApple.setPosition(newAppleLocation);
 }
 
 void Engine::togglePause() {
-    if(currentGameState == GameState::RUNNING){
-        lastGameState = currentGameState;
-        currentGameState = GameState::PAUSED;
-    }
-    else if (currentGameState == GameState::PAUSED) {
-        currentGameState = lastGameState;
+    if (mCurrentGameState == GameState::RUNNING) {
+        mLastGameState = mCurrentGameState;
+        mCurrentGameState = GameState::PAUSED;
+    } else if (mCurrentGameState == GameState::PAUSED) {
+        mCurrentGameState = mLastGameState;
     }
 }
 
-void Engine::setupText(Text *textItem, const Font &font, const String &value, int size, Color colour) {
+void Engine::setupText
+        (sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour) {
     textItem->setFont(font);
     textItem->setString(value);
     textItem->setCharacterSize(size);
     textItem->setFillColor(colour);
-
 }
 
 void Engine::checkLevelFiles() {
     //Load the levels file
-    ifstream levelsManifest ("assets/levels/levels.txt");
-    ifstream testFile;
-    for (string manifestLine; getline(levelsManifest, manifestLine);){
+    std::ifstream levelsManifest("assets/levels/levels.txt");
+    std::ifstream testFile;
+    for (std::string manifestLine; getline(levelsManifest, manifestLine);) {
         //check that the level file opens
         testFile.open("assets/levels/" + manifestLine);
-        if  (testFile.is_open()){
+        if (testFile.is_open()) {
             //the file opens -> add to the list of levels
             levels.emplace_back("assets/levels/" + manifestLine);
             testFile.close();
-            maxLevels++;
+            mMaxLevels++;
         }
     }
+    levelsManifest.close();
 }
 
-//checks a level from a file and converts 'x' characters to add wall
+//checks a level from a file and converts 'x' characters to add Wall
 void Engine::loadLevel(int levelNumber) {
-    string levelFile = levels[levelNumber - 1];
-    ifstream level (levelFile);
-    string line;
+    std::string levelFile = levels.at(levelNumber - 1);
+    std::ifstream level(levelFile);
+    std::string line;
     if (level.is_open()) {
-        for (int y = 0; y <30; y++) {
+        for (int y = 0; y < 30; y++) {
             getline(level, line);
-            for (int x = 0; x<40; x ++) {
+            for (int x = 0; x < 40; x++) {
                 if (line[x] == 'x') {
-                    wallSections.emplace_back(Wall(Vector2f(x * 20, y *20),Vector2f(20, 20)));
+                    mWallSections.emplace_back(Wall(sf::Vector2f(x * 20, y * 20), sf::Vector2f(20, 20)));
                 }
             }
         }
+        level.close();
     }
-    level.close();
 }
 
-void Engine::saveData() {
-    //load previous data
-
-    ifstream saveFileProfile ("assets/save/dataProfile.txt");
-    int a;//apples
-    int highScore;
+void Engine::saveData() const {
+    std::ifstream loadFile("assets/save/dataProfile.txt");
     int TotalApples;
-    if (saveFileProfile.is_open()){
-        saveFileProfile>>a>>highScore>>TotalApples;
-        cout<<a<<" "<<highScore<<" "<<TotalApples<<endl;
-        saveFileProfile.close();
+    int applesEaten;
+    size_t highScore;
+    if (loadFile.is_open()) {
+        loadFile >> TotalApples >> applesEaten >> highScore;
+        loadFile.close();
     }
 
-    //store new + old data
-    ofstream saveProfile ("assets/save/dataProfile.txt");
-    if (saveProfile.is_open()){
-        saveProfile<<a + applesEatenTotal<<endl;
-        if (highScore < score)
-            saveProfile<<score<<endl;
-        else saveProfile<<highScore<<endl;
+    std::ofstream saveProfile("assets/save/dataProfile.txt");
+    if (saveProfile.is_open()) {
+        saveProfile << (applesEaten + mApplesEatenTotal) << std::endl;
 
-        if (TotalApples < applesEatenTotal){
-            saveProfile<<applesEatenTotal;
+        if (TotalApples < mApplesEatenTotal) {
+            saveProfile << mApplesEatenTotal << std::endl;
+        } else {
+            saveProfile << TotalApples << std::endl;
         }
-        else saveProfile<<TotalApples;
-        cout<<a + applesEatenTotal<<" "<<score<<endl;
-        saveFileProfile.close();
+
+        if (highScore < mScore) {
+            saveProfile << mScore << std::endl;
+        } else {
+            saveProfile << highScore;
+        }
+        saveProfile.close();
     }
-
-
 }
 
-void Engine::run(){
-    Clock clock;
+void Engine::addDirection(int newDirection) {
+    if (mDirectionQueue.empty() || mDirectionQueue.back() != newDirection) {
+        mDirectionQueue.emplace_back(newDirection);
+    }
+}
 
-    //Main loop
-    while (window.isOpen()){
-        Time dt = clock.restart();
+void Engine::handleDirectionChange() {
+    if (!mDirectionQueue.empty()) {
+        auto newDirection = static_cast<Direction>(mDirectionQueue.front());
+        switch (mSnakeDirection) {
+            case Direction::UP:
+                mSnakeDirection = (newDirection != Direction::DOWN) ? newDirection : mSnakeDirection;
+                break;
+            case Direction::DOWN:
+                mSnakeDirection = (newDirection != Direction::UP) ? newDirection : mSnakeDirection;
+                break;
+            case Direction::LEFT:
+                mSnakeDirection = (newDirection != Direction::RIGHT) ? newDirection : mSnakeDirection;
+                break;
+            case Direction::RIGHT:
+                mSnakeDirection = (newDirection != Direction::LEFT) ? newDirection : mSnakeDirection;
+                break;
+        }
+        mDirectionQueue.pop_front();
+    }
+}
 
-        if(currentGameState == GameState::PAUSED || currentGameState== GameState::GAMEOVER){
-            //if paused, check for input to unpause later and continue
-            input();
+void Engine::updateScore() {
+    mScore += mSnake.size() + (mApplesEatenTotal + 1);
+    mScoreText.setString(std::to_string(mScore));
+    sf::FloatRect scoreTextBounds = mScoreText.getLocalBounds();
+    mScoreText.setPosition(mResolution.x - scoreTextBounds.width - 15, -9);
+}
 
-            //Game Over
-            if (currentGameState == GameState::GAMEOVER){
-                draw();
+void Engine::updateSnake(sf::Vector2f thisSectionPosition, sf::Vector2f lastSectionPosition) {
+    if (mSectionsToAdd) {
+        addSnake();
+        mSectionsToAdd--;
+    }
+
+    //Update snakes head position
+    switch (mSnakeDirection) {
+        case Direction::RIGHT:
+            mSnake[0].setPosition(sf::Vector2f(thisSectionPosition.x + 20, thisSectionPosition.y));
+            break;
+        case Direction::DOWN:
+            mSnake[0].setPosition(sf::Vector2f(thisSectionPosition.x, thisSectionPosition.y + 20));
+            break;
+        case Direction::LEFT:
+            mSnake[0].setPosition(sf::Vector2f(thisSectionPosition.x - 20, thisSectionPosition.y));
+            break;
+        case Direction::UP:
+            mSnake[0].setPosition(sf::Vector2f(thisSectionPosition.x, thisSectionPosition.y - 20));
+            break;
+    }
+
+    //Update mSnake tail position
+    for (size_t s = 1; s < mSnake.size(); s++) {
+        thisSectionPosition = mSnake[s].getPosition();
+        mSnake[s].setPosition(lastSectionPosition);
+        lastSectionPosition = thisSectionPosition;
+    }
+
+    for (auto &s: mSnake) {
+        s.update();
+    }
+}
+
+void Engine::collisionWithApple() {
+    if (checkCollision(mSnake[0].getShape(), mApple.getSprite())) {
+        mApplesEatenThisLevel += 1;
+        mApplesEatenTotal += 1;
+        mApplesEatenText.setString("apples " + std::to_string(mApplesEatenTotal));
+        sf::FloatRect currentLevelTextBounds = mCurrentLevelText.getGlobalBounds();
+        mApplesEatenText.setPosition(
+                sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
+
+        bool beginningNewLevel = false;
+        if (mApplesEatenThisLevel >= 10) {
+            if (mCurrentLevel < mMaxLevels) {
+                beginningNewLevel = true;
+                beginNextLevel();
             }
-            sleep(milliseconds(2));
-            continue;
         }
+        if (!beginningNewLevel) {
+            mSectionsToAdd += 4;
+            mSpeed++;
+            moveApple();
+        }
+    }
+}
 
-        timeSinceLastMove += dt;
-
-        input();
-        update();
-        draw();
-
+void Engine::collisionGameOver() {
+    for (size_t s = 1; s < mSnake.size(); s++) {
+        if (checkCollision(mSnake[0].getShape(), mSnake[s].getShape())) {
+            toggleGameOver();
+        }
     }
 
-}
-void Engine::runMenu(){
-    window.close();
-    MainMenu menu;
-    menu.Menu();
+    for (auto &w: mWallSections) {
+        if (checkCollision(mSnake[0].getShape(), w.getShape())) {
+            toggleGameOver();
+        }
+    }
 }
 
+bool Engine::checkCollision(sf::RectangleShape shape1, sf::RectangleShape shape2) {
+    return shape1.getGlobalBounds().intersects(shape2.getGlobalBounds());
+}
+
+void Engine::toggleGameOver() {
+    mCurrentGameState = GameState::GAMEOVER;
+}
