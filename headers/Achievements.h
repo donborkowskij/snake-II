@@ -26,7 +26,6 @@ public:
 private:
     std::shared_ptr<Param> mParam;
     sf::Font mFont;
-    int mShopSelect;
     sf::Text mAchiveText[ACHIEVEMENT_ELEMENTS];
     sf::Text mTextChild[ACHIEVEMENT_ELEMENTS];
     sf::Text mExtraText[3];
@@ -36,7 +35,12 @@ private:
     sf::Texture mBackground;
     sf::Sprite mBgImage;
 
-    void dataHandling();
+    int mMyApples;
+    int mMyScore;
+    int mTotalApples;
+    int mShopSelect = 0;
+
+    void loadData();
 
     void handleKeyInput(sf::Keyboard::Key keyCode);
 

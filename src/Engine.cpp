@@ -1,8 +1,6 @@
 #include "Engine.h"
 #include "iostream"
 
-const sf::Time Engine::TimePerFrame = sf::seconds(1.f / 60.f);
-
 Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
     try {
         if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
@@ -18,36 +16,45 @@ Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
     maxLevels = 0;
     checkLevelFiles();
 
-    setupText(&titleText, mFont, "Snake", 28, sf::Color::Blue);
-    sf::FloatRect titleTextBounds = titleText.getLocalBounds();
-    titleText.setPosition(sf::Vector2f(resolution.x / 2 - titleTextBounds.width / 2, -9));
+    sf::FloatRect textBounds;
 
+    // Title Text
+    setupText(&titleText, mFont, "Snake", 28, sf::Color::Blue);
+    textBounds = titleText.getLocalBounds();
+    titleText.setPosition(sf::Vector2f(resolution.x / 2 - textBounds.width / 2, -9));
+
+    // Current Level Text
     setupText(&currentLevelText, mFont, "level 1", 28, sf::Color::Blue);
     currentLevelText.setPosition(sf::Vector2f(15, -9));
-    sf::FloatRect currentLevelTextBounds = currentLevelText.getGlobalBounds();
+    textBounds = currentLevelText.getGlobalBounds();
 
+    // Apples Eaten Text
     setupText(&applesEatenText, mFont, "apples 0", 28, sf::Color::Blue);
-    applesEatenText.setPosition(sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
+    applesEatenText.setPosition(sf::Vector2f(textBounds.left + textBounds.width + 20, -9));
 
+    // Score Text
     setupText(&scoreText, mFont, std::to_string(score), 28, sf::Color::Blue);
-    sf::FloatRect scoreTextBounds = scoreText.getLocalBounds();
-    scoreText.setPosition(resolution.x - scoreTextBounds.width - 15, -9);
+    textBounds = scoreText.getLocalBounds();
+    scoreText.setPosition(resolution.x - textBounds.width - 15, -9);
 
+    // Game Over Text
     setupText(&gameOverText, mFont, "GAME OVER", 72, sf::Color::Yellow);
-    sf::FloatRect gameOverTextBounds = gameOverText.getLocalBounds();
-    gameOverText.setPosition(sf::Vector2f(resolution.x / 2 - gameOverTextBounds.width / 2, 100));
+    textBounds = gameOverText.getLocalBounds();
+    gameOverText.setPosition(sf::Vector2f(resolution.x / 2 - textBounds.width / 2, 100));
     gameOverText.setOutlineColor(sf::Color::Black);
     gameOverText.setOutlineThickness(2);
 
+    // Quit to Menu Text
     setupText(&quitToMenuText, mFont, "Press Q to quit to Main menu", 30, sf::Color::Yellow);
-    sf::FloatRect quitToMenuBounds = quitToMenuText.getLocalBounds();
-    quitToMenuText.setPosition(sf::Vector2f(resolution.x / 2 - quitToMenuBounds.width / 2, 500));
+    textBounds = quitToMenuText.getLocalBounds();
+    quitToMenuText.setPosition(sf::Vector2f(resolution.x / 2 - textBounds.width / 2, 500));
     quitToMenuText.setOutlineColor(sf::Color::Black);
     quitToMenuText.setOutlineThickness(1);
 
+    // Press Space Text
     setupText(&pressSpaceText, mFont, "Press SPACE to try again", 38, sf::Color::Green);
-    sf::FloatRect pressSpaceTextBounds = pressSpaceText.getLocalBounds();
-    pressSpaceText.setPosition(sf::Vector2f(resolution.x / 2 - pressSpaceTextBounds.width / 2, 200));
+    textBounds = pressSpaceText.getLocalBounds();
+    pressSpaceText.setPosition(sf::Vector2f(resolution.x / 2 - textBounds.width / 2, 200));
     pressSpaceText.setOutlineColor(sf::Color::Black);
     pressSpaceText.setOutlineThickness(2);
 
@@ -108,11 +115,10 @@ void Engine::input() {
     sf::Event event{};
 
     while (mParam->window->pollEvent(event)) {
-        //Close window
         if (event.type == sf::Event::Closed) {
             mParam->window->close();
         }
-        //keyboard input
+
         if (event.type == sf::Event::KeyPressed) {
             if (event.key.code == sf::Keyboard::Escape) {
                 mParam->window->close();
@@ -122,37 +128,43 @@ void Engine::input() {
                 togglePause();
             }
 
-            //New game
             if (currentGameState == GameState::GAMEOVER) {
+                saveData();
                 if (event.key.code == sf::Keyboard::Space) {
                     startTheGame();
-                }
-                if (event.key.code == sf::Keyboard::Q) {
-                    saveData();
+                } else if (event.key.code == sf::Keyboard::Q) {
                     mParam->states->add(std::make_unique<MainMenu>(mParam));
                 }
             }
 
-            if (event.key.code == sf::Keyboard::Up) {
-                addDirection(Direction::UP);
-            } else if (event.key.code == sf::Keyboard::Down) {
-                addDirection(Direction::DOWN);
-            } else if (event.key.code == sf::Keyboard::Left) {
-                addDirection(Direction::LEFT);
-            } else if (event.key.code == sf::Keyboard::Right) {
-                addDirection(Direction::RIGHT);
+            switch (event.key.code) {
+                case sf::Keyboard::Up:
+                    addDirection(Direction::UP);
+                    break;
+                case sf::Keyboard::Down:
+                    addDirection(Direction::DOWN);
+                    break;
+                case sf::Keyboard::Left:
+                    addDirection(Direction::LEFT);
+                    break;
+                case sf::Keyboard::Right:
+                    addDirection(Direction::RIGHT);
+                    break;
+                default:
+                    break;
             }
         }
     }
 }
 
 void Engine::startTheGame() {
-
+    // Reset game parameters
     score = 0;
     speed = 5;
     snakeDirection = Direction::RIGHT;
     timeSinceLastMove = sf::Time::Zero;
 
+    // Reset snake and level data
     sectionsToAdd = 0;
     directionQueue.clear();
     wallSections.clear();
@@ -164,12 +176,18 @@ void Engine::startTheGame() {
     moveApple();
     currentGameState = GameState::RUNNING;
     lastGameState = currentGameState;
+
+    // Update UI elements
     currentLevelText.setString("level " + std::to_string(currentLevel));
     applesEatenText.setString("apples " + std::to_string(applesEatenTotal));
+
     sf::FloatRect currentLevelTextBounds = currentLevelText.getGlobalBounds();
-    applesEatenText.setPosition(sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
-    scoreText.setString(std::to_string(score));
     sf::FloatRect scoreTextBounds = scoreText.getLocalBounds();
+
+    // Update positions of UI elements
+    applesEatenText.setPosition
+    (sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
+    scoreText.setString(std::to_string(score));
     scoreText.setPosition(resolution.x - scoreTextBounds.width - 15, -9);
 }
 
@@ -188,8 +206,8 @@ void Engine::beginNextLevel() {
     moveApple();
     currentLevelText.setString("level " + std::to_string(currentLevel));
     sf::FloatRect currentLevelTextBounds = currentLevelText.getGlobalBounds();
-    applesEatenText.setPosition(sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
-
+    applesEatenText.setPosition
+    (sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
 }
 
 //new Snake at the beginning of a level;
@@ -252,7 +270,8 @@ void Engine::togglePause() {
     }
 }
 
-void Engine::setupText(sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour) {
+void Engine::setupText
+(sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour) {
     textItem->setFont(font);
     textItem->setString(value);
     textItem->setCharacterSize(size);
@@ -299,24 +318,24 @@ void Engine::saveData() {
     size_t highScore;
     int TotalApples;
     if (saveFileProfile.is_open()) {
-        saveFileProfile >> applesEaten >> highScore >> TotalApples;
+        saveFileProfile >> TotalApples >> applesEaten >> highScore;
         std::cout << applesEaten << " " << highScore << " " << TotalApples << std::endl;
         saveFileProfile.close();
     }
 
-    //store new + old data
     std::ofstream saveProfile("assets/save/dataProfile.txt");
     if (saveProfile.is_open()) {
         saveProfile << applesEaten + applesEatenTotal << std::endl;
-        if (highScore < score)
-            saveProfile << score << std::endl;
-        else saveProfile << highScore << std::endl;
 
-        if (TotalApples < applesEatenTotal) {
+        if (TotalApples < applesEatenTotal)
             saveProfile << applesEatenTotal;
-        } else saveProfile << TotalApples;
-        std::cout << applesEaten + applesEatenTotal << " " << score << std::endl;
-        std::cout << " yoppppppppppppppppppppppppppp" << std::endl;
+        else
+            saveProfile << TotalApples;
+
+        if (highScore < score)
+            saveProfile << score;
+        else
+            saveProfile << highScore;
         saveFileProfile.close();
     }
 }

@@ -1,11 +1,6 @@
 #include "Achievements.h"
 #include "iostream"
 
-int Myapples;
-int Myscore;
-int TotalApples;
-int ShopSelect = 0;
-
 Achievements::Achievements(std::shared_ptr<Param> param) : mParam(param) {
     try {
         if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
@@ -15,6 +10,8 @@ Achievements::Achievements(std::shared_ptr<Param> param) : mParam(param) {
     catch (const char *txtE) {
         std::cout << "Exception: " << txtE << std::endl;
     }
+
+    loadData();
 
     TextInfo achiveTextInfo[] = {
             {"Apple I",         35, sf::Vector2f(75, 110), mGrayColor},
@@ -55,9 +52,9 @@ Achievements::Achievements(std::shared_ptr<Param> param) : mParam(param) {
     };
 
     TextInfo extraTextInfo[] = {
-            {"Press Q to quit to Main menu",                      30, sf::Vector2f(420, 560), mOrangeColor},
-            {"Most apples eaten: " + std::to_string(::Myapples),  40, sf::Vector2f(75, 5),    mOrangeColor},
-            {"Your highest score: " + std::to_string(::Myapples), 40, sf::Vector2f(75, 45),   mOrangeColor},
+            {"Press Q to quit to Main menu",                     30, sf::Vector2f(420, 560), mOrangeColor},
+            {"Most apples eaten: " + std::to_string(mMyApples),  40, sf::Vector2f(75, 5),    mOrangeColor},
+            {"Your highest score: " + std::to_string(mMyApples), 40, sf::Vector2f(75, 45),   mOrangeColor},
     };
 
     for (int i = 0; i < ACHIEVEMENT_ELEMENTS; ++i) {
@@ -93,7 +90,7 @@ void Achievements::update(const sf::Time &deltaTime) {
 void Achievements::draw() {
     mParam->window->clear();
     mParam->window->draw(mBgImage);
-    screen(mParam->window, ::ShopSelect);
+    screen(mParam->window, mShopSelect);
     mParam->window->display();
 }
 
@@ -114,10 +111,10 @@ void Achievements::input() {
 }
 
 void Achievements::handleKeyInput(sf::Keyboard::Key keyCode) {
-    if (keyCode == sf::Keyboard::Down && ::ShopSelect != 12) {
-        ::ShopSelect += 4;
-    } else if (keyCode == sf::Keyboard::Up && ::ShopSelect != 0) {
-        ::ShopSelect -= 4;
+    if (keyCode == sf::Keyboard::Down && mShopSelect != 12) {
+        mShopSelect += 4;
+    } else if (keyCode == sf::Keyboard::Up && mShopSelect != 0) {
+        mShopSelect -= 4;
     } else if (keyCode == sf::Keyboard::Q) {
         mParam->states->add(std::make_unique<MainMenu>(mParam));
     }
@@ -138,18 +135,6 @@ void Achievements::color(int i) {
     mAchiveText[i].setFillColor(sf::Color(212, 175, 55));
     mTextChild[i].setFillColor(sf::Color(212, 175, 55));
 }
-
-void Achievements::dataHandling() {
-    std::ifstream saveFileProfile("assets/save/dataProfile.txt");
-
-    if (saveFileProfile.is_open()) {
-        saveFileProfile >> ::Myapples >> ::Myscore >> ::TotalApples;
-        saveFileProfile.close();
-    }
-    mExtraText[1].setString("Most apples eaten: " + std::to_string(::TotalApples));
-    mExtraText[2].setString("Your highest score: " + std::to_string(::Myscore));
-}
-
 
 void Achievements::brain() {
     // Define the achievement conditions and colors
@@ -174,21 +159,32 @@ void Achievements::brain() {
     };
 
     for (auto const &i: conditions) {
-        if (::TotalApples >= i.first)
+        if (mTotalApples >= i.first)
             color(i.second);
     }
 
     for (auto const &i: scoreConditions) {
-        if (::TotalApples >= i.first)
+        if (mMyScore >= i.first)
             color(i.second);
     }
 
     // Additional special conditions
-    if (::TotalApples == 1337) {
+    if (mTotalApples == 1337) {
         color(14);
     }
 
-    if (::TotalApples >= 69 && ::Myscore >= 420) {
+    if (mTotalApples >= 69 && mMyScore >= 420) {
         color(15);
     }
+}
+
+void Achievements::loadData() {
+    std::ifstream saveFileProfile("assets/save/dataProfile.txt");
+
+    if (saveFileProfile.is_open()) {
+        saveFileProfile >> mTotalApples >> mMyApples >> mMyScore;
+        saveFileProfile.close();
+    }
+    mExtraText[1].setString("Most apples eaten: " + std::to_string(mMyApples));
+    mExtraText[2].setString("Your highest score: " + std::to_string(mMyScore));
 }

@@ -38,7 +38,6 @@ private:
     sf::Time timeSinceLastMove;
 
     std::vector<Snake> snake;
-
     int snakeDirection;
     std::deque<int> directionQueue;
     int speed;
@@ -48,8 +47,8 @@ private:
     unsigned long long int score;
 
     Apple apple;
-
     std::vector<Wall> wallSections;
+
     int currentLevel;
     int maxLevels;
     std::vector<sf::String> levels;
@@ -62,8 +61,6 @@ private:
     sf::Text gameOverText;
     sf::Text pressSpaceText;
     sf::Text quitToMenuText;
-
-
 
     int currentGameState;
     int lastGameState;
