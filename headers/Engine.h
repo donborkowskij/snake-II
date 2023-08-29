@@ -12,7 +12,6 @@
 #include "Achievements.h"
 #include "State.h"
 
-
 class Engine : public State {
 public:
     Engine(std::shared_ptr<Param> param);
@@ -61,6 +60,8 @@ private:
 
     void collisionGameOver();
 
+    bool checkCollision(sf::RectangleShape shape1, sf::RectangleShape shape2);
+
     void toggleGameOver();
 
     enum Direction {
@@ -72,6 +73,7 @@ private:
 
     std::shared_ptr<Param> mParam;
     sf::Vector2f mResolution;
+    const unsigned int FPS = 60;
     static const sf::Time mTimePerFrame;
     sf::Time mTimeSinceLastMove;
 
@@ -89,7 +91,7 @@ private:
 
     int mCurrentLevel;
     int mMaxLevels;
-    std::vector<sf::String> mLevels;
+    std::vector<sf::String> levels;
 
     sf::Font mFont;
     sf::Text mTitleText;

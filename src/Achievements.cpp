@@ -29,13 +29,13 @@ Achievements::Achievements(std::shared_ptr<Param> param) : mParam(param) {
     };
 
     TextInfo textChildInfo[] = {
-            {"You ate 1 Apple.",                   20, sf::Vector2f(75, 160), mGrayColor},
-            {"You ate 10 apples.",                 20, sf::Vector2f(75, 270), mGrayColor},
-            {"You ate 50 apples.",                 20, sf::Vector2f(75, 380), mGrayColor},
-            {"You ate 100 apples.",                20, sf::Vector2f(75, 490), mGrayColor},
-            {"You ate 200 apples.",                20, sf::Vector2f(75, 160), mGrayColor},
-            {"You ate 500 apples.",                20, sf::Vector2f(75, 270), mGrayColor},
-            {"You ate 1000 apples.",               20, sf::Vector2f(75, 380), mGrayColor},
+            {"You ate 1 Apple.",                    20, sf::Vector2f(75, 160), mGrayColor},
+            {"You ate 10 apples.",                  20, sf::Vector2f(75, 270), mGrayColor},
+            {"You ate 50 apples.",                  20, sf::Vector2f(75, 380), mGrayColor},
+            {"You ate 100 apples.",                 20, sf::Vector2f(75, 490), mGrayColor},
+            {"You ate 200 apples.",                 20, sf::Vector2f(75, 160), mGrayColor},
+            {"You ate 500 apples.",                 20, sf::Vector2f(75, 270), mGrayColor},
+            {"You ate 1000 apples.",                20, sf::Vector2f(75, 380), mGrayColor},
             {"You got a mScore of 100 points.",     20, sf::Vector2f(75, 490), mGrayColor},
             {"You got a mScore of 1000 points.",    20, sf::Vector2f(75, 160), mGrayColor},
             {"You got a mScore of 5000 points.",    20, sf::Vector2f(75, 270), mGrayColor},
@@ -43,14 +43,14 @@ Achievements::Achievements(std::shared_ptr<Param> param) : mParam(param) {
             {"You got a mScore of 50000 points.",   20, sf::Vector2f(75, 490), mGrayColor},
             {"You got a mScore of 1000000 points.", 20, sf::Vector2f(75, 160), mGrayColor},
             {"You got a mScore of 5000000 points.", 20, sf::Vector2f(75, 270), mGrayColor},
-            {"A good n00b?",                       20, sf::Vector2f(75, 380), mGrayColor},
-            {"2 funny numbers.",                   20, sf::Vector2f(75, 490), mGrayColor},
+            {"A good n00b?",                        20, sf::Vector2f(75, 380), mGrayColor},
+            {"2 funny numbers.",                    20, sf::Vector2f(75, 490), mGrayColor},
     };
 
     TextInfo extraTextInfo[] = {
             {"Press Q to quit to Main menu",                       30, sf::Vector2f(420, 560), mOrangeColor},
             {"Most apples eaten: " + std::to_string(mTotalApples), 40, sf::Vector2f(75, 5),    mOrangeColor},
-            {"Your highest mScore: " + std::to_string(mMyScore),    40, sf::Vector2f(75, 45),   mOrangeColor},
+            {"Your highest mScore: " + std::to_string(mMyScore),   40, sf::Vector2f(75, 45),   mOrangeColor},
     };
 
     for (int i = 0; i < ACHIEVEMENT_ELEMENTS; ++i) {
@@ -178,10 +178,7 @@ void Achievements::loadData() {
     std::ifstream saveFileProfile("assets/save/dataProfile.txt");
 
     if (saveFileProfile.is_open()) {
-        std::cout << "ACHIVE function" << std::endl;
         saveFileProfile >> mTotalApples >> mMyApples >> mMyScore;
         saveFileProfile.close();
-        std::cout << "mTotalApples: " << mTotalApples << " mMyApples: " << mMyApples << " mMyScore: " << mMyScore
-                  << std::endl;
     }
 }

@@ -19,6 +19,7 @@ public:
 
 private:
     static void loadSnakeColor(sf::RectangleShape &section);
+
     sf::Vector2f position;
     sf::RectangleShape section;
 };

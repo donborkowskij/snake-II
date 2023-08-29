@@ -3,13 +3,9 @@
 #include <iostream>
 
 Shop::Shop(std::shared_ptr<Param> param) : mParam(param) {
-    try {
-        if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
-            throw "mFont not loaded!!!";
-        }
-    }
-    catch (const char *txtE) {
-        std::cout << "Exception: " << txtE << std::endl;
+    if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
+        std::cerr << "mFont not loaded!!!";
+        std::exit(EXIT_FAILURE);
     }
 
     loadCurrency();
@@ -204,7 +200,7 @@ void Shop::loadBought() {
 void Shop::saveBought() {
     std::ofstream saveFileProfile("assets/save/Bought.txt", std::ofstream::trunc);
     if (saveFileProfile.is_open()) {
-        saveFileProfile << mEquipped<< std::endl;
+        saveFileProfile << mEquipped << std::endl;
         saveFileProfile.close();
     }
 }

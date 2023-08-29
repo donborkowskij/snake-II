@@ -8,6 +8,7 @@ Engine::Engine(std::shared_ptr<Param> param) : mParam(param) {
     }
 
     mResolution = sf::Vector2f(800, 600);
+    mParam->window->setFramerateLimit(FPS);
     mMaxLevels = 0;
     checkLevelFiles();
 
@@ -182,7 +183,7 @@ void Engine::startTheGame() {
 
     // Update positions of UI elements
     mApplesEatenText.setPosition
-    (sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
+            (sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
     mScoreText.setString(std::to_string(mScore));
     mScoreText.setPosition(mResolution.x - scoreTextBounds.width - 15, -9);
 }
@@ -203,7 +204,7 @@ void Engine::beginNextLevel() {
     mCurrentLevelText.setString("level " + std::to_string(mCurrentLevel));
     sf::FloatRect currentLevelTextBounds = mCurrentLevelText.getGlobalBounds();
     mApplesEatenText.setPosition
-    (sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
+            (sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
 }
 
 //new Snake at the beginning of a level;
@@ -267,7 +268,7 @@ void Engine::togglePause() {
 }
 
 void Engine::setupText
-(sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour) {
+        (sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour) {
     textItem->setFont(font);
     textItem->setString(value);
     textItem->setCharacterSize(size);
@@ -275,24 +276,25 @@ void Engine::setupText
 }
 
 void Engine::checkLevelFiles() {
-    //Load the mLevels file
-    std::ifstream levelsManifest("assets/mLevels/mLevels.txt");
+    //Load the levels file
+    std::ifstream levelsManifest("assets/levels/levels.txt");
     std::ifstream testFile;
     for (std::string manifestLine; getline(levelsManifest, manifestLine);) {
         //check that the level file opens
-        testFile.open("assets/mLevels/" + manifestLine);
+        testFile.open("assets/levels/" + manifestLine);
         if (testFile.is_open()) {
-            //the file opens -> add to the list of mLevels
-            mLevels.emplace_back("assets/mLevels/" + manifestLine);
+            //the file opens -> add to the list of levels
+            levels.emplace_back("assets/levels/" + manifestLine);
             testFile.close();
             mMaxLevels++;
         }
     }
+    levelsManifest.close();
 }
 
 //checks a level from a file and converts 'x' characters to add Wall
 void Engine::loadLevel(int levelNumber) {
-    std::string levelFile = mLevels[levelNumber - 1];
+    std::string levelFile = levels.at(levelNumber - 1);
     std::ifstream level(levelFile);
     std::string line;
     if (level.is_open()) {
@@ -304,8 +306,8 @@ void Engine::loadLevel(int levelNumber) {
                 }
             }
         }
+        level.close();
     }
-    level.close();
 }
 
 void Engine::saveData() const {
@@ -324,15 +326,13 @@ void Engine::saveData() const {
 
         if (TotalApples < mApplesEatenTotal) {
             saveProfile << mApplesEatenTotal << std::endl;
-        }
-        else {
+        } else {
             saveProfile << TotalApples << std::endl;
         }
 
         if (highScore < mScore) {
             saveProfile << mScore << std::endl;
-        }
-        else {
+        } else {
             saveProfile << highScore;
         }
         saveProfile.close();
@@ -340,12 +340,8 @@ void Engine::saveData() const {
 }
 
 void Engine::addDirection(int newDirection) {
-    if (mDirectionQueue.empty()) {
+    if (mDirectionQueue.empty() || mDirectionQueue.back() != newDirection) {
         mDirectionQueue.emplace_back(newDirection);
-    } else {
-        if (mDirectionQueue.back() != newDirection) {
-            mDirectionQueue.emplace_back(newDirection);
-        }
     }
 }
 
@@ -412,7 +408,7 @@ void Engine::updateSnake(sf::Vector2f thisSectionPosition, sf::Vector2f lastSect
 }
 
 void Engine::collisionWithApple() {
-    if (mSnake[0].getShape().getGlobalBounds().intersects(mApple.getSprite().getGlobalBounds())) {
+    if (checkCollision(mSnake[0].getShape(), mApple.getSprite())) {
         mApplesEatenThisLevel += 1;
         mApplesEatenTotal += 1;
         mApplesEatenText.setString("apples " + std::to_string(mApplesEatenTotal));
@@ -437,16 +433,20 @@ void Engine::collisionWithApple() {
 
 void Engine::collisionGameOver() {
     for (size_t s = 1; s < mSnake.size(); s++) {
-        if (mSnake[0].getShape().getGlobalBounds().intersects(mSnake[s].getShape().getGlobalBounds())) {
+        if (checkCollision(mSnake[0].getShape(), mSnake[s].getShape())) {
             toggleGameOver();
         }
     }
 
     for (auto &w: mWallSections) {
-        if (mSnake[0].getShape().getGlobalBounds().intersects(w.getShape().getGlobalBounds())) {
+        if (checkCollision(mSnake[0].getShape(), w.getShape())) {
             toggleGameOver();
         }
     }
+}
+
+bool Engine::checkCollision(sf::RectangleShape shape1, sf::RectangleShape shape2) {
+    return shape1.getGlobalBounds().intersects(shape2.getGlobalBounds());
 }
 
 void Engine::toggleGameOver() {
