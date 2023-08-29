@@ -33,29 +33,30 @@ private:
     int mMainTextFontSize = 35;
     int mTextChildFontSize = 20;
 
-    int returnBought(int number);
+    int mShopCurrency;
+    int mEquipped;
+//------------------------
+    void loadBought();//+
 
+    void loadCurrency();//+
+
+    void buySnakeColor(int colorIndex, int price);//+
+
+    void saveBought();//+
+
+    void saveData();//+
+//--------------------
     void moveUp();
 
     void moveDown();
 
-    void print(std::unique_ptr<sf::RenderWindow> &window);
+    void print(std::unique_ptr<sf::RenderWindow> &window);//-
 
     void drawExtra(std::unique_ptr<sf::RenderWindow> &window);
-
-    void loadData();
-
-    void saveBought(int array[]);
-
-    void saveData();
-
-    void snakeColorBuy(int a);
 
     void handleKeyInput(sf::Keyboard::Key keyCode);
 
     void returnToMainMenu();
 
     void handleShopSelection();
-
-    void buySnakeColor(int colorIndex, int price);
 };

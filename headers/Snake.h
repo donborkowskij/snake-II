@@ -1,13 +1,13 @@
 #pragma once
 
 #include <SFML/Graphics.hpp>
+#include "iostream"
+#include <fstream>
 
 
 class Snake {
 public:
     explicit Snake(sf::Vector2f startPosition);
-
-    static void snakeColor(int a);
 
     sf::RectangleShape getShape();
 
@@ -20,4 +20,6 @@ public:
 private:
     sf::Vector2f position;
     sf::RectangleShape section;
+
+    static void loadSnakeColor(sf::RectangleShape &section);
 };

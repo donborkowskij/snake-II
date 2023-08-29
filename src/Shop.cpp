@@ -2,8 +2,6 @@
 #include "MainMenu.h"
 #include "iostream"
 
-int Shop_currency;
-
 Shop::Shop(std::shared_ptr<Param> param) : mParam(param) {
     try {
         if (!mFont.loadFromFile("assets/fonts/slant_regular.ttf")) {
@@ -13,6 +11,9 @@ Shop::Shop(std::shared_ptr<Param> param) : mParam(param) {
     catch (const char *txtE) {
         std::cout << "Exception: " << txtE << std::endl;
     }
+
+    loadCurrency();
+    loadBought();
 
     sf::Color altTextColor[]{
             sf::Color::Green,
@@ -47,7 +48,7 @@ Shop::Shop(std::shared_ptr<Param> param) : mParam(param) {
 
     mExtraText[1].setFont(mFont);
     mExtraText[1].setFillColor(mFillColor);
-    mExtraText[1].setString("Apples: " + std::to_string(::Shop_currency));
+    mExtraText[1].setString("Apples: " + std::to_string(mShopCurrency));
     mExtraText[1].setCharacterSize(40);
     mExtraText[1].setPosition(sf::Vector2f(75, 25));
 
@@ -97,7 +98,7 @@ void Shop::handleKeyInput(sf::Keyboard::Key keyCode) {
         moveUp();
     } else if (keyCode == sf::Keyboard::Q) {
         returnToMainMenu();
-    } else if (keyCode == sf::Keyboard::Return) {
+    } else if (keyCode == sf::Keyboard::Enter) {
         handleShopSelection();
     }
 }
@@ -120,19 +121,6 @@ void Shop::handleShopSelection() {
         case 3:
             buySnakeColor(3, 50);
             break;
-    }
-}
-
-void Shop::buySnakeColor(int colorIndex, int price) {
-    int array[4] = {};
-    array[colorIndex] = 1;
-    if (returnBought(colorIndex) == 1) {
-        snakeColorBuy(colorIndex);
-    } else if (::Shop_currency >= price) {
-        ::Shop_currency -= price;
-        snakeColorBuy(colorIndex);
-        saveBought(array);
-        saveData();
     }
 }
 
@@ -161,26 +149,23 @@ void Shop::moveDown() {
 }
 
 void Shop::print(std::unique_ptr<sf::RenderWindow> &window) {
-    int number;
-    for (int c = 0; c <= 3; c++) {
-        window->draw(mMainText[c]);
-        number = returnBought(c);
-        if (number == 0) {
-            window->draw(mTextChild[c]);
+    for (int i = 0; i < SHOP_ELEMENTS; i++) {
+        window->draw(mMainText[i]);
+        if (i != mEquipped) {
+            window->draw(mTextChild[i]);
         } else {
-            window->draw(mAltText[c]);
+            window->draw(mAltText[i]);
         }
     }
 }
 
 void Shop::drawExtra(std::unique_ptr<sf::RenderWindow> &window) {
-    mExtraText[1].setString("Apples: " + std::to_string(::Shop_currency));
+    mExtraText[1].setString("Apples: " + std::to_string(mShopCurrency));
     window->draw(mExtraText[0]);
     window->draw(mExtraText[1]);
 }
 
 void Shop::saveData() {
-    //load previous data
     std::ifstream saveFileProfile("assets/save/dataProfile.txt");
     int apples;
     int score;
@@ -189,88 +174,48 @@ void Shop::saveData() {
         saveFileProfile.close();
     }
 
-    //store new + old data
     std::ofstream saveProfile("assets/save/dataProfile.txt", std::ofstream::trunc);
     if (saveProfile.is_open()) {
-        saveProfile << ::Shop_currency << std::endl << score;
+        saveProfile << mShopCurrency << std::endl << score;
         saveFileProfile.close();
     }
 }
 
-void Shop::loadData() {
+void Shop::loadCurrency() {
     std::ifstream saveFileProfile("assets/save/dataProfile.txt");
     if (saveFileProfile.is_open()) {
-        int a;
-        saveFileProfile >> a;
-        saveFileProfile.close();
-        ::Shop_currency = a;
+        if (saveFileProfile >> mShopCurrency) {
+            saveFileProfile.close();
+        } else {
+            std::cerr << "Error reading integer from the file." << std::endl;
+        }
+    } else {
+        std::cerr << "Could not open file for reading." << std::endl;
     }
 }
 
-int Shop::returnBought(int number) {
-    //load previous data
-    int GreenSnake, RedSnake, BlueSnake, YellowSnake;
+void Shop::loadBought() {
     std::ifstream saveFileProfile("assets/save/Bought.txt");
     if (saveFileProfile.is_open()) {
-        saveFileProfile >> GreenSnake >> RedSnake >> BlueSnake >> YellowSnake;
-        saveFileProfile.close();
+        saveFileProfile >> mEquipped;
     }
-    if (number == 0) {
-        return GreenSnake;
-    }
-    if (number == 1) {
-        return RedSnake;
-    }
-    if (number == 2) {
-        return BlueSnake;
-    }
-    if (number == 3) {
-        return YellowSnake;
-    }
-    return 0;
 }
 
-void Shop::saveBought(int array[]) {
-    int GreenSnake = 0;
-    int RedSnake = 0;
-    int BlueSnake = 0;
-    int YellowSnake = 0;
-
-    //load previous data
-    std::ifstream saveFileProfile("assets/save/Bought.txt");
+void Shop::saveBought() {
+    std::ofstream saveFileProfile("assets/save/Bought.txt", std::ofstream::trunc);
     if (saveFileProfile.is_open()) {
-        saveFileProfile >> GreenSnake >> RedSnake >> BlueSnake >> YellowSnake;
+        saveFileProfile << mEquipped<< std::endl;
         saveFileProfile.close();
-    }
-
-    //store new + old data
-    std::ofstream saveProfile("assets/save/Bought.txt", std::ofstream::trunc);
-    if (saveProfile.is_open()) {
-        if (GreenSnake >= array[0]) {
-            saveProfile << GreenSnake << std::endl;
-        } else {
-            saveProfile << array[0] << std::endl;
-        }
-        if (RedSnake >= array[1]) {
-            saveProfile << RedSnake << std::endl;
-        } else {
-            saveProfile << array[1] << std::endl;
-        }
-        if (array[0] != BlueSnake) {
-            saveProfile << BlueSnake << std::endl;
-        } else {
-            saveProfile << array[2] << std::endl;
-        }
-        if (array[0] != YellowSnake) {
-            saveProfile << YellowSnake << std::endl;
-        } else {
-            saveProfile << array[3] << std::endl;
-        }
-        saveProfile.close();
     }
 }
 
-void Shop::snakeColorBuy(int a) {
-    Snake::snakeColor(a);
-
+void Shop::buySnakeColor(int colorIndex, int price) {
+    int array[SHOP_ELEMENTS] = {};
+    array[colorIndex] = 1;
+    if (mShopCurrency >= price) {
+        mShopCurrency -= price;
+        mEquipped = colorIndex;
+        saveBought();
+        saveData();
+    }
 }

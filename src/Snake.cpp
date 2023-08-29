@@ -1,10 +1,26 @@
 #include "Snake.h"
 
-int a;
-
 Snake::Snake(sf::Vector2f startPosition) {
     section.setSize(sf::Vector2f(20, 20));
-    switch (a) {
+    section.setPosition(startPosition);
+    loadSnakeColor(section);
+    position = startPosition;
+}
+
+void Snake::loadSnakeColor(sf::RectangleShape &section) {
+    int fillColor;
+    std::ifstream saveFileProfile("assets/save/Bought.txt");
+    if (saveFileProfile.is_open()) {
+        if (saveFileProfile >> fillColor) {
+            saveFileProfile.close();
+        } else {
+            std::cerr << "Error reading integer from the file." << std::endl;
+        }
+    } else {
+        std::cerr << "Could not open file for reading." << std::endl;
+    }
+
+    switch (fillColor) {
         case 0:
             section.setFillColor(sf::Color::Green);
             break;
@@ -21,13 +37,6 @@ Snake::Snake(sf::Vector2f startPosition) {
             section.setFillColor(sf::Color::Green);
             break;
     }
-    //section.setFillColor(Color::Green);
-    section.setPosition(startPosition);
-    position = startPosition;
-}
-
-void Snake::snakeColor(int b) {
-    ::a = b;
 }
 
 sf::Vector2f Snake::getPosition() {
