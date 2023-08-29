@@ -45,7 +45,7 @@ private:
 
     void startTheGame();
 
-    void togglePause();
+    void togglePause(sf::Event& event);
 
     void saveData() const;
 

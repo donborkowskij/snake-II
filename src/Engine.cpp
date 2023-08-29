@@ -122,9 +122,7 @@ void Engine::input() {
                 mParam->window->close();
             }
 
-            if (event.key.code == sf::Keyboard::Pause) {
-                togglePause();
-            }
+            togglePause(event);
 
             if (mCurrentGameState == GameState::GAMEOVER) {
                 if (event.key.code == sf::Keyboard::Space) {
@@ -260,17 +258,18 @@ void Engine::moveApple() {
     mApple.setPosition(newAppleLocation);
 }
 
-void Engine::togglePause() {
-    if (mCurrentGameState == GameState::RUNNING) {
-        mLastGameState = mCurrentGameState;
-        mCurrentGameState = GameState::PAUSED;
-    } else if (mCurrentGameState == GameState::PAUSED) {
-        mCurrentGameState = mLastGameState;
+void Engine::togglePause(sf::Event& event) {
+    if (event.key.code == sf::Keyboard::Pause) {
+        if (mCurrentGameState == GameState::RUNNING) {
+            mLastGameState = mCurrentGameState;
+            mCurrentGameState = GameState::PAUSED;
+        } else if (mCurrentGameState == GameState::PAUSED) {
+            mCurrentGameState = mLastGameState;
+        }
     }
 }
 
-void Engine::setupText
-        (sf::Text *textItem, const sf::Font &font, const sf::String &value, int size, sf::Color colour) {
+void Engine::setupText(sf::Text *textItem,const sf::Font &font,const sf::String &value,int size,sf::Color colour) {
     textItem->setFont(font);
     textItem->setString(value);
     textItem->setCharacterSize(size);
@@ -415,8 +414,7 @@ void Engine::collisionWithApple() {
         mApplesEatenTotal += 1;
         mApplesEatenText.setString("apples " + std::to_string(mApplesEatenTotal));
         sf::FloatRect currentLevelTextBounds = mCurrentLevelText.getGlobalBounds();
-        mApplesEatenText.setPosition(
-                sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
+        mApplesEatenText.setPosition(sf::Vector2f(currentLevelTextBounds.left + currentLevelTextBounds.width + 20, -9));
 
         bool beginningNewLevel = false;
         if (mApplesEatenThisLevel >= 10) {
