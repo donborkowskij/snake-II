@@ -71,36 +71,35 @@ private:
     };
 
     std::shared_ptr<Param> mParam;
-    sf::Vector2f resolution;
-    const unsigned int FPS = 60;
-    static const sf::Time TimePerFrame;
-    sf::Time timeSinceLastMove;
+    sf::Vector2f mResolution;
+    static const sf::Time mTimePerFrame;
+    sf::Time mTimeSinceLastMove;
 
-    std::vector<Snake> snake;
-    int snakeDirection;
-    std::deque<int> directionQueue;
-    int speed;
-    int sectionsToAdd;
-    int applesEatenThisLevel;
-    int applesEatenTotal;
-    unsigned long long int score;
+    std::vector<Snake> mSnake;
+    int mSnakeDirection;
+    std::deque<int> mDirectionQueue;
+    int mSpeed;
+    int mSectionsToAdd;
+    int mApplesEatenThisLevel;
+    int mApplesEatenTotal;
+    unsigned long long int mScore;
 
-    Apple apple;
-    std::vector<Wall> wallSections;
+    Apple mApple;
+    std::vector<Wall> mWallSections;
 
-    int currentLevel;
-    int maxLevels;
-    std::vector<sf::String> levels;
+    int mCurrentLevel;
+    int mMaxLevels;
+    std::vector<sf::String> mLevels;
 
     sf::Font mFont;
-    sf::Text titleText;
-    sf::Text applesEatenText;
-    sf::Text currentLevelText;
-    sf::Text scoreText;
-    sf::Text gameOverText;
-    sf::Text pressSpaceText;
-    sf::Text quitToMenuText;
+    sf::Text mTitleText;
+    sf::Text mApplesEatenText;
+    sf::Text mCurrentLevelText;
+    sf::Text mScoreText;
+    sf::Text mGameOverText;
+    sf::Text mPressSpaceText;
+    sf::Text mQuitToMenuText;
 
-    int currentGameState;
-    int lastGameState;
+    int mCurrentGameState;
+    int mLastGameState;
 };
