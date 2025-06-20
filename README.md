@@ -35,3 +35,16 @@ cmake --build .
 ```
 ./snake
 ```
+## Screenshots
+<table>
+  <tr>
+    <td><img src="imgs/main-menu.png"  width="500"/>
+    <td><img src="imgs/shop.png"  width="500"/>
+    <td><img src="imgs/achievement.png"  width="500"/>
+  </tr>
+  <tr>
+    <td><img src="imgs/game-over.png"  width="500"/>
+    <td><img src="imgs/red-snake.png"  width="500"/>
+    <td><img src="imgs/level-2.png"  width="500"/>
+  </tr>
+</table>
